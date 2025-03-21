@@ -1,0 +1,121 @@
+﻿@model IEnumerable<HolidayRequestViewModel>
+@{
+    ViewData["Title"] = "My Requests";
+    var employeeId = TempData["EmployeeId"];
+}
+<html>
+<head>
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            display: inline-block;
+            margin-bottom: 15px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+        }
+
+        td {
+            padding: 10px;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #e9ecef;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            const messageBox = document.getElementById("message-box");
+            if (messageBox) {
+                setTimeout(() => {
+                    messageBox.style.opacity = "0";
+                    setTimeout(() => messageBox.remove(), 500);
+                }, 5000);
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>طلبات الإجازة</h1>
+
+        @if (ViewBag.Message != null)
+        {
+            <div id="message-box" class="message-box">
+                @ViewBag.Message
+            </div>
+            ViewBag.Message = null;
+        }
+
+
+        <div>
+            <a asp-action="RequestHoliday" asp-route-employeeId="@employeeId" class="btn-primary">طلب إجازة</a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>تاريخ الإجازة</th>
+                    <th>الحالة</th>
+                    <th>سبب الإجازة</th>
+                    <th>سبب الرفض (إن وجد)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var request in Model)
+                {
+                    <tr>
+                        <td>@request.HolidayDate.ToString("yyyy-MM-dd")</td>
+                        <td>@request.Status</td>
+                        <td>@request.ReasonOfHoliday</td>
+                        <td>@request.ReasonOfRejection</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,116 @@
+﻿@model List<DiscountViewModel>
+@{
+    ViewData["Title"] = "GetAllDiscounts";
+    TempData.Keep("MonthlyEmployeeDataId");
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض الخصومات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            width: 90%;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+            .btn:hover {
+                background-color: #0056b3;
+            }
+
+        .btn-danger {
+            background-color: #dc3545;
+        }
+
+            .btn-danger:hover {
+                background-color: #c82333;
+            }
+
+        .add-btn {
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>عرض الخصومات للموظف: @ViewBag.EmployeeName</h1>
+
+        <form asp-action="AddDiscount" method="get">
+            <input type="hidden" name="MonthlyEmployeeDataId" value="@TempData["MonthlyEmployeeDataId"]" />
+            <button type="submit">اضافه خصم</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>الرقم التعريفي</th>
+                    <th>التاريخ</th>
+                    <th>المبلغ</th>
+                    <th>السبب</th>
+                    <th>ملاحظات</th>
+                    <th>إجراء</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var discount in Model)
+                {
+                    <tr>
+                        <td>@discount.Id</td>
+                        <td>@discount.Date</td>
+                        <td>@discount.Amount</td>
+                        <td>@discount.ReasonOfDiscount</td>
+                        <td>@discount.Notes</td>
+                        <td>
+                            <form asp-action="DeleteDiscount" method="post">
+                                <input type="hidden" name="id" value="@discount.Id"/>
+                                <button type="submit" class="btn btn-danger">حذف</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

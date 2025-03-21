@@ -1,0 +1,132 @@
+﻿@model IEnumerable<EmployeeViewModel>
+@{
+    ViewData["Title"] = "GetAllEmployees";
+}
+
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول الموظفين</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn {
+            text-decoration: none;
+            color: white;
+            background: #dc3545;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+            .btn:hover {
+                background: #c82333;
+            }
+
+        .message-box {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 10px auto;
+            width: fit-content;
+            transition: opacity 0.5s;
+            opacity: 1;
+        }
+    </style>
+    
+</head>
+<body>
+    @if (ViewBag.Message != null)
+    {
+        <div id="message-box" class="message-box">@ViewBag.Message</div>
+        <script>
+            window.onload = function () {
+                var messageBox = document.getElementById('message-box');
+                if (messageBox) {
+                    setTimeout(function () {
+                        messageBox.style.display = 'none';
+
+                        // بعد إخفاء الرسالة، ابعت الـ fetch لتمسحها
+                        fetch('/RemoveMessageController/ClearMessage', { method: 'POST' });
+                    }, 5000);
+                }
+            };
+        </script>
+    }
+    <h1>جدول الموظفين</h1>
+    <div class="container">
+        <table>
+            <thead>
+                <tr>
+                    <th>رقم الموظف</th>
+                    <th>إجراء</th>
+                    <th>اسم الموظف</th>
+                    <th>الفرع</th>
+                    <th>الدور الوظيفي</th>
+                    <th>اسم البنك</th>
+                    <th>رقم الحساب البنكي</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var employee in Model)
+                {
+                    <tr>
+                        <td>@employee.Id</td>
+                        <td>
+                            <form asp-action="DeleteEmployee" method="post">
+                                <input type="hidden" name="id" value="@employee.Id" />
+                                <button type="submit" class="btn">حذف</button>
+                            </form>
+                        </td>
+                        <td>@employee.Name</td>
+                        <td>@employee.BranchName</td>
+                        <td>@employee.Role</td>
+                        <td>@employee.BankName</td>
+                        <td>@employee.BankAccount</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

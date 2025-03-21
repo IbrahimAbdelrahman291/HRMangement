@@ -1,0 +1,80 @@
+﻿@model BorrowViewModel
+@{
+    ViewData["Title"] = "AddBorrow";
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة سُلفة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            width: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, textarea, button {
+            padding: 10px;
+            margin-bottom: 15px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>إضافة سُلفة</h1>
+        <form asp-action="AddBorrow" method="post">
+            <input type="hidden" name="MonthlyEmployeeDataId" value="@TempData["MonthlyEmployeeDataId"]" />
+
+            <label asp-for="Amount">المبلغ</label>
+            <input asp-for="Amount" type="number" required />
+
+            <label asp-for="Reason">السبب</label>
+            <textarea asp-for="Reason" rows="4" required></textarea>
+
+            <label asp-for="Notes">ملاحظات</label>
+            <textarea asp-for="Notes" rows="2"></textarea>
+
+            <label asp-for="DateOfBorrow">التاريخ</label>
+            <input asp-for="DateOfBorrow" type="date" required />
+
+            <button type="submit">إضافة</button>
+        </form>
+    </div>
+</body>
+</html>

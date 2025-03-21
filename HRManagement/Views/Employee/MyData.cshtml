@@ -1,0 +1,81 @@
+﻿@model EmployeeViewModel
+@{
+    ViewData["Title"] = "GetEmployee";
+}
+
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بيانات الموظف</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn {
+            text-decoration: none;
+            color: white;
+            background: #dc3545;
+            padding: 5px 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+            .btn:hover {
+                background: #c82333;
+            }
+    </style>
+</head>
+<body>
+    <h1>بيانات الموظف</h1>
+    <div class="container">
+        <table>
+            <tr><th>Id</th><td>@Model.Id</td></tr>
+            <tr><th>الاسم</th><td>@Model.Name</td></tr>
+            <tr><th>الفرع</th><td>@Model.BranchName</td></tr>
+            <tr><th>الدور الوظيفي</th><td>@Model.Role</td></tr>
+            <tr><th>البنك</th><td>@Model.BankName</td></tr>
+            <tr><th>حساب البنك</th><td>@Model.BankAccount</td></tr>
+            <tr><th>الشهر</th><td>@Model.Month</td></tr>
+            <tr><th>السنة</th><td>@Model.Year</td></tr>
+            <tr><th>عدد الساعات</th><td>@Model.Hours</td></tr>
+            <tr><th>الساعات الإضافية</th><td>@Model.HoursOverTime</td></tr>
+            <tr><th>الراتب بالساعة</th><td>@Model.SalaryPerHour</td></tr>
+            <tr><th>إجمالي الراتب</th><td>@Model.TotalSalary</td></tr>
+            <tr><th>صافي المرتب</th><td>@Model.NetSalary</td></tr>
+        </table>
+    </div>
+</body>
+</html>

@@ -1,0 +1,144 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            position: relative;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 14px;
+        }
+
+            .logout-btn:hover {
+                background-color: #0056b3;
+            }
+
+        .instructions-box {
+            position: relative;
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 250px;
+            transition: transform 0.3s;
+        }
+
+            .card:hover {
+                transform: scale(1.05);
+            }
+
+            .card h2 {
+                color: #333;
+            }
+
+            .card a {
+                display: block;
+                text-decoration: none;
+                color: white;
+                background: #007bff;
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 15px;
+            }
+
+                .card a:hover {
+                    background: #0056b3;
+                }
+
+        
+    </style>
+</head>
+<body>
+    <form asp-action="Logout" asp-controller="Auth" method="post">
+        <button type="submit" class="logout-btn">تسجيل الخروج</button>
+    </form>
+
+    @if (ViewBag.Message != null)
+    {
+        <div id="message-box" class="message-box">@ViewBag.Message</div>
+        ViewBag.Message = null;
+    }
+
+    <div class="instructions-box">
+        <h3>تعليمات للمدير:</h3>
+        <p>- عند ادخال يوزر جديد سواء كان مدير فروع او موارد بشريه او محاسبين يجب ادخال يزور وباسورد</p>
+        <p>- يجب اعطاء اليوزر والباسور للمستخدم المضاف ليتمكن من الدخول على الموقع</p>
+        <p>- يجب ان يكون اليوزر بالانجليزيه ولا يوجد اي فراغات</p>
+        <p>- يمكنك اضافه موارد بشريه ومحاسبين ومدير فروع ويمكنك حذفهم ويمكنك حذف موظفين ايضا</p>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>الموارد البشرية</h2>
+            <p>إدارة الموارد البشرية</p>
+            <a asp-action="GetAllHR">إدارة HR</a>
+        </div>
+        <div class="card">
+            <h2>الموظفين</h2>
+            <p>عرض جميع الموظفين</p>
+            <a asp-action="GetAllEmployees">عرض الموظفين</a>
+        </div>
+        <div class="card">
+            <h2>المحاسبين</h2>
+            <p>عرض جميع المحاسبين</p>
+            <a asp-action="GetAllAccountant">عرض المحاسبين</a>
+        </div>
+        <div class="card">
+            <h2>مدير الفروع</h2>
+            <p>عرض جميع المديريين</p>
+            <a asp-action="GetAllBranchesManager">عرض المديريين</a>
+        </div>
+    </div>
+</body>
+</html>

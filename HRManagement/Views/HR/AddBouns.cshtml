@@ -1,0 +1,80 @@
+﻿@model BounsViewModel
+@{
+    ViewData["Title"] = "AddBouns";
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة مكافأة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            width: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, textarea, button {
+            padding: 10px;
+            margin-bottom: 15px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            button:hover {
+                background-color: #218838;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>إضافة مكافأة</h1>
+        <form asp-action="AddBouns" method="post">
+            <input asp-for="MonthlyEmployeeDataId" type="hidden" value="@TempData["MonthlyEmployeeDataId"]" />
+
+            <label for="Amount">المبلغ</label>
+            <input asp-for="Amount" type="number" placeholder="المبلغ" required />
+
+            <label for="Reason">السبب</label>
+            <textarea asp-for="Reason" rows="4" required></textarea>
+
+            <label for="Notes">ملاحظات</label>
+            <textarea asp-for="Notes" rows="2"></textarea>
+
+            <label for="DateOfBouns">التاريخ</label>
+            <input asp-for="DateOfBouns" type="date" required />
+
+            <button type="submit">إضافة</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,135 @@
+﻿@model EmployeeViewModel
+@{
+    ViewData["Title"] = "AddEmployee";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add Employee</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        form {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            button:hover {
+                background-color: #218838;
+            }
+
+        .dynamic-field {
+            display: none;
+        }
+    </style>
+    <script>
+        function handleRoleChange() {
+            const role = document.getElementById('Role').value;
+            const totalSalaryField = document.getElementById('totalSalaryField');
+            const salaryPerHourField = document.getElementById('salaryPerHourField');
+
+            if (role === 'static') {
+                totalSalaryField.style.display = 'block';
+                salaryPerHourField.style.display = 'none';
+            } else {
+                totalSalaryField.style.display = 'none';
+                salaryPerHourField.style.display = 'block';
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <h1>اضافه موظف جديد</h1>
+
+    <form asp-action="AddEmployee" method="post">
+        <div>
+            <label for="UserName">اسم المستخدم</label>
+            <input type="text" asp-for="UserName" placeholder="اسم المستخدم" required />
+        </div>
+
+        <div>
+            <label for="Password">كلمه السر</label>
+            <input type="password" asp-for="Password" placeholder="كلمه السر" required />
+        </div>
+
+        <div>
+            <label for="Name">الاسم</label>
+            <input type="text" asp-for="Name" placeholder="الاسم" required />
+        </div>
+
+        <div>
+            <label for="Role">الدور</label>
+            <select asp-for="Role" required onchange="handleRoleChange()">
+                <option value="">اختيار</option>
+                <option value="static">ثابت</option>
+                <option value="changable">متغير</option>
+                <option value="delivery">ديلفري</option>
+            </select>
+        </div>
+
+        <div>
+            <label for="BranchName">اسم الفرع</label>
+            <input type="text" asp-for="BranchName" placeholder="اسم الفرع" required />
+        </div>
+
+        <div id="totalSalaryField" class="dynamic-field">
+            <label for="TotalSalary">اجمالي المرتب</label>
+            <input type="number" asp-for="TotalSalary" min="0" placeholder="المرتب كامل" />
+        </div>
+
+        <div id="salaryPerHourField" class="dynamic-field">
+            <label for="SalaryPerHour">المرتب بالساعه</label>
+            <input type="number" asp-for="SalaryPerHour" min="0" placeholder="المرتب بالساعه" />
+        </div>
+
+        <div>
+            <label for="BankName">اسم البنك</label>
+            <input type="text" asp-for="BankName" placeholder="اسم البنك" required />
+        </div>
+
+        <div>
+            <label for="BankAccount">رقم الحساب</label>
+            <input type="text" asp-for="BankAccount" placeholder="رقم الحساب" />
+        </div>
+
+        <button type="submit">اضافه</button>
+    </form>
+
+</body>
+</html>

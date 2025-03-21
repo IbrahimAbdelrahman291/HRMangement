@@ -1,0 +1,141 @@
+﻿@model IEnumerable<HolidayRequestViewModel>
+@{
+    ViewData["Title"] = "GetAllHolidaysRequests";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get All Holidays Requests</title>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th {
+            background-color: #e5e7eb;
+            padding: 12px;
+            text-align: center;
+        }
+
+        td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+            td button {
+                padding: 8px 16px;
+                border-radius: 5px;
+                border: none;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+                td button.bg-green-500 {
+                    background-color: #10b981;
+                    color: white;
+                }
+
+                    td button.bg-green-500:hover {
+                        background-color: #059669;
+                    }
+
+                td button.bg-red-500 {
+                    background-color: #ef4444;
+                    color: white;
+                }
+
+                    td button.bg-red-500:hover {
+                        background-color: #dc2626;
+                    }
+
+        .message-box {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #34d399;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            transition: opacity 0.5s;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            const messageBox = document.getElementById("message-box");
+            if (messageBox) {
+                setTimeout(() => {
+                    messageBox.style.opacity = "0";
+                    setTimeout(() => messageBox.remove(), 500);
+                }, 5000);
+            }
+        }
+    </script>
+</head>
+<body>
+    @if (ViewBag.Message != null)
+    {
+        <div id="message-box" class="message-box">
+            @ViewBag.Message
+        </div>
+    }
+
+    <div class="container">
+        <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">طلبات الإجازات</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم الموظف</th>
+                    <th>تاريخ الإجازة</th>
+                    <th>سبب الإجازة</th>
+                    <th>موافقة</th>
+                    <th>رفض</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var request in Model)
+                {
+                    <tr>
+                        <td>@request.EmployeeName</td>
+                        <td>@request.HolidayDate</td>
+                        <td>@request.ReasonOfHoliday</td>
+                        <td>
+                            <form asp-action="ApproveRequest" method="get">
+                                <input type="hidden" name="Id" value="@request.Id" />
+                                <input type="hidden" name="EmployeeName" value="@request.EmployeeName" />
+                                <button type="submit" class="bg-green-500">قبول</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form asp-action="RejectRequest" method="get">
+                                <input type="hidden" name="Id" value="@request.Id" />
+                                <input type="hidden" name="EmployeeName" value="@request.EmployeeName" />
+                                <button type="submit" class="bg-red-500">رفض</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

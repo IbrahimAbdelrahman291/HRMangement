@@ -1,0 +1,92 @@
+﻿@{
+    ViewData["Title"] = "Manage Job";
+    TempData.Keep("EmployeeId");
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الدوام</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            position: relative;
+        }
+
+        form {
+            display: inline-block;
+            margin: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 10px auto;
+            width: fit-content;
+            transition: opacity 0.5s;
+            opacity: 1;
+        }
+    </style>
+
+    <script>
+        window.onload = function () {
+            const messageBox = document.getElementById("message-box");
+            if (messageBox) {
+                setTimeout(() => {
+                    messageBox.style.opacity = "0";
+                    setTimeout(() => messageBox.remove(), 500);
+                }, 5000); 
+            }
+        }
+    </script>
+</head>
+<body>
+
+    @if (ViewBag.Message != null)
+    {
+        <div id="message-box" class="message-box">
+            @ViewBag.Message
+        </div>
+        ViewBag.Message = null;
+    }
+
+    <h1>إدارة دوامي</h1>
+
+    <form asp-action="StartJob" method="post">
+        <input type="hidden" name="EmployeeId" value="@TempData["EmployeeId"]" />
+        <button type="submit">بداية الشيفت</button>
+    </form>
+
+    <form asp-action="EndJob" method="post">
+        <input type="hidden" name="EmployeeId" value="@TempData["EmployeeId"]" />
+        <button type="submit">إنهاء الشيفت</button>
+    </form>
+
+</body>
+</html>

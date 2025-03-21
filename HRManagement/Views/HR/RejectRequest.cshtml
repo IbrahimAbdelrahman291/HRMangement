@@ -1,0 +1,97 @@
+﻿@model HolidayRequestViewModel
+@{
+    ViewData["Title"] = "RejectRequest";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رفض طلب الإجازة</title>
+    <style>
+        body {
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+            textarea[readonly] {
+                background-color: #e9ecef;
+                color: #495057;
+            }
+
+        button {
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+            button:hover {
+                background-color: #c0392b;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="title">رفض طلب الإجازة</h2>
+        <form asp-action="RejectRequest" method="post">
+            <div class="form-group">
+                <label>اسم الموظف:</label>
+                <input type="text" value="@Model.EmployeeName" readonly>
+            </div>
+            <div class="form-group">
+                <label>تاريخ الإجازة:</label>
+                <input type="text" value="@Model.HolidayDate.ToString("yyyy-MM-dd")" readonly>
+            </div>
+            <div class="form-group">
+                <label>سبب الإجازة:</label>
+                <textarea readonly>@Model.ReasonOfHoliday</textarea>
+            </div>
+            <div class="form-group">
+                <label>سبب الرفض:</label>
+                <textarea name="ReasonOfReject" required></textarea>
+            </div>
+            <input type="hidden" name="Id" value="@Model.Id" />
+            <input type="hidden" name="EmployeeId" value="@Model.EmployeeId" />
+            <button type="submit">رفض</button>
+        </form>
+    </div>
+</body>
+</html>
