@@ -130,7 +130,10 @@
                             </form>
                         </td>
                         <td>
-                            N/A
+                            <form asp-action="GetAllBorrows" method="get">
+                                <input type="hidden" name="monthlyEmployeeDataId" value="@employee.MonthlyEmployeeDataId" />
+                                <button type="submit" class="btn">خصم</button>
+                            </form>
                         </td>
                         <td>
                             <form asp-action="GetAllBouns" method="get">
