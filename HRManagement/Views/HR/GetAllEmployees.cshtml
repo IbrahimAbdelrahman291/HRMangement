@@ -107,6 +107,7 @@
                     <th>السنة</th>
                     <th>عدد الساعات</th>
                     <th>عدد ساعات العمل الإضافي</th>
+                    <th>الاجازات</th>
                     <th>الراتب بالساعة</th>
                     <th>إجمالي الراتب</th>
                     <th>صافي المرتب</th>
@@ -150,6 +151,7 @@
                         <td>@employee.Year</td>
                         <td>@employee.Hours</td>
                         <td>@employee.HoursOverTime</td>
+                        <td>@employee.Holidaies</td>
                         <td>@employee.SalaryPerHour</td>
                         <td>@employee.TotalSalary</td>
                         <td>@Math.Round((double)employee.NetSalary, 2).ToString("F2")</td>

@@ -373,7 +373,7 @@ namespace HRManagement.Controllers
             return View(MappedRequest);
         }
         [HttpPost] 
-        public async Task<IActionResult> ApproveRequest(HolidayRequestViewModel model) 
+        public async Task<IActionResult> ApproveRequest(HolidayRequestViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -383,7 +383,10 @@ namespace HRManagement.Controllers
                     return RedirectToAction("GetAllHolidaysRequests", new { message = "الموظف غير موجود يبدو ان حدث خطأ" });
                 }
 
-                var temp = employee.MonthlyData.FirstOrDefault();
+                var temp = employee.MonthlyData
+                                  .OrderByDescending(m => m.Year)
+                                  .ThenByDescending(m => m.Month)
+                                  .FirstOrDefault(); 
                 if (temp != null)
                 {
                     if (temp.Holidaies > 0)
@@ -391,7 +394,10 @@ namespace HRManagement.Controllers
                         temp.Holidaies -= 1;
                         _empRepo.Update(employee);
                     }
-                    return RedirectToAction("GetAllHolidaysRequests", new { message = "لا يوجد اجازات متاحه" });
+                    else
+                    {
+                        return RedirectToAction("GetAllHolidaysRequests", new { message = "لا يوجد اجازات متاحه" });
+                    }
                 }
 
                 var request = await _context.HolidayRequests.FindAsync(model.Id);
@@ -440,6 +446,7 @@ namespace HRManagement.Controllers
                 }
 
                 request.status = "مرفوض";
+                request.ReasonOfRejection = model.ReasonOfRejection;
                 _context.HolidayRequests.Update(request);
 
                 int Result = await _empRepo.CompleteAsync();

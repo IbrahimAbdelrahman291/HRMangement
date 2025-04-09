@@ -59,7 +59,7 @@ namespace HRManagement.Controllers
             }
             else if (await _userManager.IsInRoleAsync(user, "Manager"))
             {
-                return RedirectToAction("Index", "Manager");
+                return RedirectToAction("Index", "BranchManager");
             }
 
             return RedirectToAction("Index", "Auth");
