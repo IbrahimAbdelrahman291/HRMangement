@@ -71,13 +71,28 @@
             border: 1px solid #ddd;
             width: 100px;
         }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+            .back-btn:hover {
+                background-color: #0056b3;
+            }
     </style>
 </head>
 <body>
     <h1>جدول الموظفين</h1>
 
     <div class="container">
-
+        <a asp-action="Index" class="back-btn">رجوع</a>
         <table>
             <thead>
                 <tr>
@@ -91,6 +106,7 @@
                     <th>السنة</th>
                     <th>عدد الساعات</th>
                     <th>عدد ساعات العمل الإضافي</th>
+                    <th>عدد الساعات المنسيه</th>
                     <th>الراتب بالساعة</th>
                     <th>إجمالي الراتب</th>
                     <th>صافي المرتب</th>
@@ -110,13 +126,15 @@
                         <td>@employee.Year</td>
                         <td>@employee.Hours</td>
                         <td>@employee.HoursOverTime</td>
+                        <td>@employee.ForgetedHours</td>
                         <td>@employee.SalaryPerHour</td>
-                        <td>@employee.TotalSalary</td>
-                        <td>@employee.NetSalary</td>
+                        <td>@Math.Round((double)employee.TotalSalary, 2).ToString("F2")</td>
+                        <td>@Math.Round((double)employee.NetSalary, 2).ToString("F2")</td>
                     </tr>
                 }
             </tbody>
         </table>
+
     </div>
 </body>
 </html>

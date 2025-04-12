@@ -1,6 +1,6 @@
-﻿@model HolidayRequestViewModel
+﻿@model ResignationRequestsViewModel
 @{
-    ViewData["Title"] = "طلب إجازة";
+    ViewData["Title"] = "AddResignationRequest";
     int employeeId = (int)TempData["EmployeeId"];
     TempData["EmployeeId"] = employeeId;
 }
@@ -26,16 +26,17 @@
             background-color: white;
             padding: 30px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
 
         h1 {
             text-align: center;
             color: #333;
+        }
+        h2 {
+            text-align: center;
+            color: red;
         }
 
         label {
@@ -52,22 +53,21 @@
             border-radius: 5px;
         }
 
-        .btn {
-            padding: 10px 20px;
+        button {
+            width: 100%;
+            padding: 10px;
             background-color: #007bff;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             margin-top: 20px;
-            width: 100%; 
-            padding-left: 20px; 
-            padding-right: 20px;
+            transition: background-color 0.3s;
         }
 
-            .btn:hover {
-                background-color: #0056b3;
-            }
+        button:hover {
+            background-color: #0056b3;
+        }
 
         .back-btn {
             display: inline-block;
@@ -87,21 +87,20 @@
 </head>
 <body>
     <div class="form-container">
-        <h1>طلب إجازة</h1>
+        <h1>طلب استقاله</h1>
+        <h2>سوف يتم قبول الاستقاله بعد 21 يوم من تاريخ قبول الاستقاله وليس تاريخ تقديم الاستقاله</h2>
 
-        <form asp-action="RequestHoliday" method="post">
+        <form asp-action="AddResignationRequest" method="post">
             <input type="hidden" name="EmployeeId" value="@employeeId" />
 
-            <label for="HolidayDate">تاريخ الإجازة:</label>
-            <input type="date" id="HolidayDate" name="HolidayDate" required />
+            <label for="ReasonOfResignation">سبب الاستقاله:</label>
+            <textarea id="ReasonOfResignation" name="ReasonOfResignation" rows="4" placeholder="أدخل سبب الاستقاله هنا..." required></textarea>
 
-            <label for="ReasonOfHoliday">سبب الإجازة:</label>
-            <textarea id="ReasonOfHoliday" name="ReasonOfHoliday" rows="4" placeholder="أدخل سبب الإجازة هنا..." required></textarea>
-
-            <button type="submit" class="btn">تقديم</button>
+            <button type="submit">تقديم</button>
         </form>
 
-        <a asp-action="MyHolidaysRequests" asp-route-employeeId="@employeeId" class="back-btn">رجوع</a>
+        <a asp-action="MyResignationRequest" asp-route-employeeId="@employeeId" class="back-btn">رجوع</a>
     </div>
 </body>
 </html>
+

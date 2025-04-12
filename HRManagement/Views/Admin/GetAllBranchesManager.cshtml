@@ -12,6 +12,8 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             text-align: center;
+            margin: 0;
+            padding: 0;
         }
 
         .container {
@@ -21,6 +23,7 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
         }
 
         table {
@@ -67,7 +70,6 @@
             .add-btn:hover {
                 background: #218838;
             }
-
         .message-box {
             position: fixed;
             top: 100px;
@@ -84,10 +86,24 @@
             opacity: 1;
         }
 
+        .back-btn {
+            text-decoration: none;
+            color: white;
+            background: #007bff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            position: absolute;
+            top: 20px;
+            right: 100px;
+        }
+
+            .back-btn:hover {
+                background: #0056b3;
+            }
     </style>
-   
 </head>
 <body>
+
     @if (ViewBag.Message != null)
     {
         <div id="message-box" class="message-box">@ViewBag.Message</div>
@@ -105,8 +121,13 @@
             };
         </script>
     }
+
     <h1>إدارة المديرين</h1>
+
+    <!-- Back Button -->
+
     <div class="container">
+        <a asp-action="Index" class="back-btn">رجوع</a>
         <a asp-action="AddBranchesManager" class="add-btn">إضافة مدير</a>
         <table>
             <thead>

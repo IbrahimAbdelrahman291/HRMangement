@@ -50,13 +50,13 @@
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
-            margin: 10px 5px;
-            width: 100%;
         }
 
         .btn-primary {
             background-color: #007bff;
             color: white;
+            width: 100%;
+            margin-bottom: 15px;
         }
 
             .btn-primary:hover {
@@ -64,12 +64,17 @@
             }
 
         .btn-secondary {
-            background-color: #6c757d;
+            background-color: #007bff;
             color: white;
+            display: inline-block;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 16px;
         }
 
             .btn-secondary:hover {
-                background-color: #5a6268;
+                background-color: #0056b3;
             }
 
         a {
@@ -85,6 +90,7 @@
             <input type="password" name="password" placeholder="كلمة المرور" required />
             <button type="submit" class="btn btn-primary">إضافة مدير</button>
         </form>
+        <a asp-action="GetAllBranchesManager" class="btn-secondary">رجوع</a>
     </div>
 </body>
 </html>

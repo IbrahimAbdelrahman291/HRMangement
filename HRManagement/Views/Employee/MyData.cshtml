@@ -1,6 +1,7 @@
 ﻿@model EmployeeViewModel
 @{
     ViewData["Title"] = "GetEmployee";
+    var UserId = TempData["UserId"];
 }
 
 <html lang="ar">
@@ -56,11 +57,30 @@
             .btn:hover {
                 background: #c82333;
             }
+
+        .back-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+            .back-btn:hover {
+                background-color: #0056b3;
+            }
     </style>
 </head>
 <body>
     <h1>بيانات الموظف</h1>
     <div class="container">
+        <a asp-action="Index" asp-route-userId="@UserId" class="back-btn">رجوع</a>
         <table>
             <tr><th>Id</th><td>@Model.Id</td></tr>
             <tr><th>الاسم</th><td>@Model.Name</td></tr>

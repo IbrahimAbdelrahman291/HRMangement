@@ -126,7 +126,7 @@ namespace HRManagement.Controllers
                     TotalSalary = model.TotalSalary,
                     Month = currentMonth,
                     Year = currentYear,
-                    Holidaies = 7
+                    Holidaies = 7,
                 };
                 await _context.MonthlyEmployeeData.AddAsync(monthlyData);
             }
@@ -138,7 +138,8 @@ namespace HRManagement.Controllers
                     SalaryPerHour = model.SalaryPerHour,
                     Month = currentMonth,
                     Year = currentYear,
-                    Holidaies = 7
+                    Holidaies = 7,
+                    TotalSalary = (model.SalaryPerHour * model.Hours??0) / 26,
                 };
                 _context.MonthlyEmployeeData.Add(monthlyData);
             }
@@ -174,11 +175,14 @@ namespace HRManagement.Controllers
                 {
                     employee.NetSalary = ((((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0)) * employee.SalaryPerHour / 26)
                     + totalBounss) - (totalBorrows + (double)totalDiscounts);
+                    employee.TotalSalary = (((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0) + (employee.ForgetedHours ?? 0)) * employee.SalaryPerHour) / 26;
                 }
                 else if (employee?.Role.ToLower() == "delivery")
                 {
                     employee.NetSalary = ((((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0)) * employee.SalaryPerHour)
                     + totalBounss) - (totalBorrows + (double)totalDiscounts);
+                    employee.TotalSalary = ((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0) + (employee.ForgetedHours??0))  * employee.SalaryPerHour;
+
                 }
 
                 var monthlyData = await _context.MonthlyEmployeeData
@@ -187,6 +191,7 @@ namespace HRManagement.Controllers
                 if (monthlyData != null)
                 {
                     monthlyData.NetSalary = employee.NetSalary;
+                    monthlyData.TotalSalary = employee.TotalSalary;
                     _context.MonthlyEmployeeData.Update(monthlyData);
                 }
             }
@@ -356,6 +361,19 @@ namespace HRManagement.Controllers
             return View(MappedRequests);
         }
         [HttpGet]
+        public IActionResult GetAllHolidaysArchive(string? message)
+        {
+            var requests = _context.HolidayRequests
+                .Where(hr => hr.status == "مرفوض" || hr.status == "مقبول")
+                .Include(hr => hr.Employee)
+                .ToList();
+
+            var MappedRequests = _mapper.Map<List<HolidayRequestViewModel>>(requests);
+            ViewBag.Message = message;
+            return View(MappedRequests);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> ApproveRequest(int id)
         {
             var holidayRequest = await _context.HolidayRequests
@@ -389,9 +407,17 @@ namespace HRManagement.Controllers
                                   .FirstOrDefault(); 
                 if (temp != null)
                 {
-                    if (temp.Holidaies > 0)
+                    if (temp.Holidaies > 0 || temp.Holidaies==null)
                     {
-                        temp.Holidaies -= 1;
+                        if (temp.Holidaies == null)
+                        {
+                            temp.Holidaies = 7;
+                            temp.Holidaies -= 1;
+                        }
+                        else
+                        {
+                            temp.Holidaies -= 1;
+                        }
                         _empRepo.Update(employee);
                     }
                     else
@@ -615,6 +641,109 @@ namespace HRManagement.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToAction("GetAllBorrows", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
+        }
+
+        [HttpGet]
+        public IActionResult GetAllPendResignations(string? message) 
+        {
+            var resignations = _context.ResignationRequests
+                .Where(r => r.status == "pending")
+                .Include(r => r.Employee)
+                .ToList();
+
+            var mappedResignations = _mapper.Map<IEnumerable<ResignationRequestsViewModel>>(resignations);
+            ViewBag.Message = message;
+            return View(mappedResignations);
+        }
+        [HttpGet]
+        public IActionResult GetResignationsArchive() 
+        {
+            var resignations = _context.ResignationRequests
+                .Where(r => r.status == "مرفوض" || r.status == "مقبول")
+                .Include(r => r.Employee)
+                .ToList();
+
+            var mappedResignations = _mapper.Map<List<ResignationRequestsViewModel>>(resignations);
+            return View(mappedResignations);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ApproveResignation(int id)
+        {
+            var resignationRequest = await _context.ResignationRequests
+                .Include(r => r.Employee)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (resignationRequest == null)
+            {
+                return RedirectToAction("GetAllPendResignations", new { message = "غير موجود من المحتمل حدث خطأ" });
+            }
+
+            var mappedRequest = _mapper.Map<ResignationRequestsViewModel>(resignationRequest);
+
+            return View(mappedRequest);
+        }
+        [HttpPost]
+        public async Task<IActionResult> ApproveResignation(ResignationRequestsViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var resignationRequest = await _context.ResignationRequests.FindAsync(model.Id);
+                if (resignationRequest == null)
+                {
+                    return RedirectToAction("GetAllPendResignations", new { message = "الطلب غير موجود يبدو ان حدث خطأ" });
+                }
+
+                resignationRequest.status = "مقبول";
+                _context.ResignationRequests.Update(resignationRequest);
+
+                int result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    return RedirectToAction("GetAllPendResignations", new { message = "تم قبول الاستقاله" });
+                }
+            }
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RejectResignation(int id)
+        {
+            var resignationRequest = await _context.ResignationRequests
+                .Include(r => r.Employee)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (resignationRequest == null)
+            {
+                return RedirectToAction("GetAllPendResignations", new { message = "غير موجود من المحتمل حدث خطأ" });
+            }
+
+            var mappedRequest = _mapper.Map<ResignationRequestsViewModel>(resignationRequest);
+
+            return View(mappedRequest);
+        }
+        [HttpPost]
+        public async Task<IActionResult> RejectResignation(ResignationRequestsViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var resignationRequest = await _context.ResignationRequests.FindAsync(model.Id);
+                if (resignationRequest == null)
+                {
+                    return RedirectToAction("GetAllPendResignations", new { message = "الطلب غير موجود يبدو ان حدث خطأ" });
+                }
+
+                resignationRequest.status = "مرفوض";
+                resignationRequest.ReasonOfRejection = model.ReasonOfRejection;
+                _context.ResignationRequests.Update(resignationRequest);
+
+                int result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    return RedirectToAction("GetAllPendResignations", new { message = "تم رفض الاستقاله" });
+                }
+            }
+            return View(model);
         }
     }
 }

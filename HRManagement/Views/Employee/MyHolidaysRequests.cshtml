@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "My Requests";
     var employeeId = TempData["EmployeeId"];
+    var UserId = TempData["UserId"];
 }
 <html>
 <head>
@@ -65,6 +66,40 @@
         tr:nth-child(even) td {
             background-color: #e9ecef;
         }
+
+        .message-box {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 10px auto;
+            width: fit-content;
+            transition: opacity 0.5s;
+            opacity: 1;
+        }
+
+        .back-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+            .back-btn:hover {
+                background-color: #0056b3;
+            }
     </style>
     <script>
         window.onload = function () {
@@ -92,6 +127,7 @@
 
 
         <div>
+            <a asp-action="Index" asp-route-userId="@UserId" class="back-btn">رجوع</a>
             <a asp-action="RequestHoliday" asp-route-employeeId="@employeeId" class="btn-primary">طلب إجازة</a>
         </div>
 

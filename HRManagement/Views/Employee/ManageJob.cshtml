@@ -1,6 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Manage Job";
     TempData.Keep("EmployeeId");
+    var UserId = TempData["UserId"];
 }
 
 <!DOCTYPE html>
@@ -15,6 +16,8 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             position: relative;
+            margin: 0;
+            padding: 0;
         }
 
         form {
@@ -52,6 +55,25 @@
             transition: opacity 0.5s;
             opacity: 1;
         }
+
+        /* تخصيص زر الرجوع */
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+            .back-btn:hover {
+                background-color: #0056b3;
+            }
     </style>
 
     <script>
@@ -61,12 +83,14 @@
                 setTimeout(() => {
                     messageBox.style.opacity = "0";
                     setTimeout(() => messageBox.remove(), 500);
-                }, 5000); 
+                }, 5000);
             }
         }
     </script>
 </head>
 <body>
+
+    <a asp-action="Index" asp-route-userId="@UserId" class="back-btn">رجوع</a>
 
     @if (ViewBag.Message != null)
     {

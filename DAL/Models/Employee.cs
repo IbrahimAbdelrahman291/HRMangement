@@ -25,5 +25,6 @@ namespace DAL.Models
         public ICollection<WorkLogs> workLogs { get; set; } = new List<WorkLogs>();
         public ICollection<MonthlyEmployeeData> MonthlyData { get; set; } = new List<MonthlyEmployeeData>();
         public ICollection<HolidayRequests> HolidayRequests { get; set; } = new List<HolidayRequests>();
+        public ICollection<ResignationRequests> ResignationRequests { get; set; } = new List<ResignationRequests>();
     }
 }

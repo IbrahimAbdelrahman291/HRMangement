@@ -45,12 +45,16 @@ namespace HRManagement.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult ManageJob(int employeeId, string? message)
+        public async Task<IActionResult> ManageJob(int employeeId, string? message)
         {
 
             TempData["EmployeeId"] = employeeId;
             TempData.Keep("EmployeeId");
             ViewBag.Message = message;
+            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
+            var UserId = employee.UserId;
+            TempData["UserId"] = UserId;
+            TempData.Keep("UserId");
             return View();
         }
         [HttpPost]
@@ -183,13 +187,15 @@ namespace HRManagement.Controllers
                 var year = DateTime.UtcNow.Year;
 
                 var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(EmpId, month, year));
-
+               
                 if (employee == null)
                 {
                     TempData["ErrorMessage"] = "لا توجد بيانات للموظف.";
                     return RedirectToAction("Index");
                 }
-
+                var UserId = employee.UserId;
+                TempData["UserId"] = UserId;
+                TempData.Keep("UserId");
                 var mappedEmployee = _mapper.Map<EmployeeViewModel>(employee);
                 return View(mappedEmployee);
             }
@@ -198,11 +204,15 @@ namespace HRManagement.Controllers
             return RedirectToAction("Index");
         }
         [HttpGet]
-        public IActionResult MyRequests(int employeeId, string? message)
+        public async Task<IActionResult> MyHolidaysRequests(int employeeId, string? message)
         {
             TempData["EmployeeId"] = employeeId;
             TempData.Keep("EmployeeId");
             ViewBag.Message = message;
+            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
+            var UserId = employee.UserId;
+            TempData["UserId"] = UserId;
+            TempData.Keep("UserId");
 
             var holidayRequests = _context.HolidayRequests
                 .Where(hr => hr.EmployeeId == employeeId)
@@ -251,6 +261,69 @@ namespace HRManagement.Controllers
                 return RedirectToAction("Index", new { userId = employee.UserId, message = "تم تقديم الطلب بنجاح"});
             }
 
+            TempData.Keep("EmployeeId");
+            return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> MyResignationRequest(int employeeId, string? message)
+        {
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            ViewBag.Message = message;
+            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
+            var UserId = employee.UserId;
+            TempData["UserId"] = UserId;
+            TempData.Keep("UserId");
+            var resignationRequests = _context.ResignationRequests
+                .Where(rr => rr.EmployeeId == employeeId)
+                .ToList();
+            var mappedResignationRequests = _mapper.Map<IEnumerable<ResignationRequestsViewModel>>(resignationRequests);
+
+            return View(mappedResignationRequests);
+        }
+
+        [HttpGet]
+        public IActionResult AddResignationRequest(int employeeId) 
+        {
+            var resignationRequests = _context.ResignationRequests
+                .Where(rr => rr.EmployeeId == employeeId).Where(s => s.status == "pending" || s.status =="مقبول")
+                .ToList();
+            if (resignationRequests.Count>0)
+            {
+                return RedirectToAction("MyResignationRequest", new { employeeId = employeeId , message = "يوجد استقاله بالفعل مقدمه وقيد الانتظار او تم قبولها" });
+            }
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddResignationRequest(ResignationRequestsViewModel model) 
+        {
+            if (!ModelState.IsValid)
+            {
+                int employeeId = (int)TempData["EmployeeId"]!;
+                var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
+
+                #region get current time in Egypt
+                DateTime utcNow = DateTime.UtcNow;
+                TimeZoneInfo egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+                DateTime egyptTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, egyptTimeZone);
+                #endregion
+
+                var Resignation = new ResignationRequests() 
+                {
+                    EmployeeId = employeeId,
+                    ReasonOfResignation = model.ReasonOfResignation,
+                    ResignationDate = egyptTime,
+                    status = "pending",
+                };
+                await _context.ResignationRequests.AddAsync(Resignation);
+                await _context.SaveChangesAsync();
+                TempData["EmployeeId"] = employeeId;
+                TempData.Keep("EmployeeId");
+                return RedirectToAction("Index" , new { userId = employee.UserId , message = "تم تقديم الاستقاله بنجاح" });
+            }
             TempData.Keep("EmployeeId");
             return View(model);
         }

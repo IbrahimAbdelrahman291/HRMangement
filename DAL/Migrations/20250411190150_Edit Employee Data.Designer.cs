@@ -4,6 +4,7 @@ using DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(HRDbContext))]
-    partial class HRDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250411190150_Edit Employee Data")]
+    partial class EditEmployeeData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,7 +53,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("MonthlyEmployeeDataId");
 
-                    b.ToTable("Borrows", (string)null);
+                    b.ToTable("Borrows");
                 });
 
             modelBuilder.Entity("DAL.Models.Bouns", b =>
@@ -83,7 +85,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("MonthlyEmployeeDataId");
 
-                    b.ToTable("Bounss", (string)null);
+                    b.ToTable("Bounss");
                 });
 
             modelBuilder.Entity("DAL.Models.Discounts", b =>
@@ -114,7 +116,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("MonthlyEmployeeDataId");
 
-                    b.ToTable("Discounts", (string)null);
+                    b.ToTable("Discounts");
                 });
 
             modelBuilder.Entity("DAL.Models.Employee", b =>
@@ -149,7 +151,7 @@ namespace DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Employees", (string)null);
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("DAL.Models.HolidayRequests", b =>
@@ -180,7 +182,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("HolidayRequests", (string)null);
+                    b.ToTable("HolidayRequests");
                 });
 
             modelBuilder.Entity("DAL.Models.MonthlyEmployeeData", b =>
@@ -225,7 +227,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("MonthlyEmployeeData", (string)null);
+                    b.ToTable("MonthlyEmployeeData");
                 });
 
             modelBuilder.Entity("DAL.Models.ResignationRequests", b =>
@@ -256,7 +258,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("ResignationRequests", (string)null);
+                    b.ToTable("ResignationRequests");
                 });
 
             modelBuilder.Entity("DAL.Models.User", b =>
@@ -351,7 +353,7 @@ namespace DAL.Migrations
 
                     b.HasIndex("EmployeeId");
 
-                    b.ToTable("WorkLogs", (string)null);
+                    b.ToTable("WorkLogs");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

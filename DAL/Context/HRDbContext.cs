@@ -58,6 +58,7 @@ namespace DAL.Context
         public DbSet<HolidayRequests> HolidayRequests { get; set; }
         public DbSet<Employee> Employees { get; set; }
         public DbSet<MonthlyEmployeeData> MonthlyEmployeeData { get; set; }
+        public DbSet<ResignationRequests> ResignationRequests { get; set; }
         public DbSet<User> Users { get; set; }
     }
 }

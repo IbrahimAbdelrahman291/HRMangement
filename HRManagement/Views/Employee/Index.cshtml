@@ -1,9 +1,4 @@
-﻿@{
-    ViewData["Title"] = "Index";
-    TempData.Keep("EmployeeId");
-}
-
-<html lang="ar">
+﻿<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -35,15 +30,15 @@
             }
 
         .info-box {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+            margin: 20px auto;
             padding: 15px;
-            width: 200px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: right;
+            width: 80%;
+            max-width: 600px;
         }
 
         .message-box {
@@ -66,7 +61,7 @@
             display: flex;
             justify-content: center;
             gap: 20px;
-            margin-top: 80px;
+            margin-top: 30px;
         }
 
         .card {
@@ -146,7 +141,12 @@
         <div class="card">
             <h2>الاجازات</h2>
             <p>تقديم اجازه ونتائج الاجازات</p>
-            <a asp-action="MyRequests" asp-route-employeeId="@TempData["EmployeeId"]">اداره الاجازات</a>
+            <a asp-action="MyHolidaysRequests" asp-route-employeeId="@TempData["EmployeeId"]">اداره الاجازات</a>
+        </div>
+        <div class="card">
+            <h2>الاستقالات</h2>
+            <p>تقديم استقاله ونتائج الاستقالات</p>
+            <a asp-action="MyResignationRequest" asp-route-employeeId="@TempData["EmployeeId"]">اداره الاستقالات</a>
         </div>
     </div>
 </body>

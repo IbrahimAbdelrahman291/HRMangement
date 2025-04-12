@@ -1,0 +1,158 @@
+﻿@model IEnumerable<ResignationRequestsViewModel>
+@{
+    ViewData["Title"] = "GetAllPendResignations";
+}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>طلبات الاستقالة المعلقة</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            padding: 0;
+            margin: 0;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 30px;
+            color: #2c3e50;
+        }
+
+        .top-btn-container {
+            text-align: end;
+            margin: 20px 40px 0 0;
+        }
+
+            .top-btn-container a {
+                background-color: #8e44ad;
+                color: white;
+                padding: 10px 18px;
+                text-decoration: none;
+                border-radius: 8px;
+                font-size: 1rem;
+            }
+
+        .resignation-table {
+            width: 95%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+        }
+
+            .resignation-table th,
+            .resignation-table td {
+                padding: 12px;
+                border: 1px solid #ddd;
+                text-align: center;
+            }
+
+            .resignation-table th {
+                background-color: #2c3e50;
+                color: white;
+            }
+
+            .resignation-table tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .accept-btn {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .reject-btn {
+            background-color: #c0392b;
+            color: white;
+        }
+
+        .message-box {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #34d399;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            transition: opacity 0.5s;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            const messageBox = document.getElementById("message-box");
+            if (messageBox) {
+                setTimeout(() => {
+                    messageBox.style.opacity = "0";
+                    setTimeout(() => messageBox.remove(), 500);
+                }, 5000);
+            }
+        }
+    </script>
+</head>
+<body>
+    @if (ViewBag.Message != null)
+    {
+        <div id="message-box" class="message-box">
+            @ViewBag.Message
+        </div>
+    }
+    <h2>طلبات الاستقالة المعلقة</h2>
+
+    <div class="top-btn-container">
+        <a asp-action="GetResignationsArchive" method="get">الأرشيف</a>
+    </div>
+
+    <table class="resignation-table">
+        <thead>
+            <tr>
+                <th>اسم الموظف</th>
+                <th>تاريخ الاستقالة</th>
+                <th>الحالة</th>
+                <th>سبب الاستقالة</th>
+                <th>سبب الرفض</th>
+                <th>قبول</th>
+                <th>رفض</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.EmployeeName</td>
+                        <td>@item.ResignationDate</td>
+                        <td>@item.Status</td>
+                        <td>@item.ReasonOfResignation</td>
+                        <td>@item.ReasonOfRejection</td>
+                        <td>
+                            <form asp-action="ApproveResignation" method="get">
+                                <input type="hidden" name="Id" value="@item.Id" />
+                                <button type="submit" class="bg-red-500">قبول</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form asp-action="RejectResignation" method="get">
+                                <input type="hidden" name="Id" value="@item.Id" />
+                                <button type="submit" class="bg-red-500">رفض</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+</body>
+</html>

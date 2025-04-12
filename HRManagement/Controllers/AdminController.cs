@@ -25,7 +25,6 @@ namespace HRManagement.Controllers
             _userManager = userManager;
             _roleManager = roleManager;
         }
-        //تمت المعالجه الكامله
 
         public IActionResult Index()
         {
@@ -146,8 +145,6 @@ namespace HRManagement.Controllers
 
             return RedirectToAction("GetAllHR", new { message = "حدث خطأ غير معروف" });
         }
-
-
 
         [HttpGet]
         public async Task<IActionResult> GetAllAccountant(string? message =null ) 

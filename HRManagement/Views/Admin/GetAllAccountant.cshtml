@@ -68,6 +68,21 @@
                 background: #218838;
             }
 
+        .back-btn {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            float: right;
+        }
+
+            .back-btn:hover {
+                background: #0056b3;
+            }
+
         .message-box {
             position: fixed;
             top: 100px;
@@ -84,7 +99,7 @@
             opacity: 1;
         }
     </style>
-    
+
 </head>
 <body>
     @if (ViewBag.Message != null)
@@ -106,6 +121,7 @@
     }
     <h1>إدارة المحاسبين</h1>
     <div class="container">
+        <a asp-action="Index" class="back-btn">رجوع</a>
         <a asp-action="AddAccountant" class="add-btn">إضافة محاسب</a>
         <table>
             <thead>

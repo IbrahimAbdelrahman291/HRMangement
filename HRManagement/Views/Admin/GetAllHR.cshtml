@@ -83,8 +83,20 @@
             transition: opacity 0.5s;
             opacity: 1;
         }
+
+        .back-btn {
+            text-decoration: none;
+            color: white;
+            background: #007bff;
+            padding: 10px 15px;
+            border-radius: 5px;
+            float: right; 
+        }
+
+            .back-btn:hover {
+                background: #0056b3;
+            }
     </style>
-   
 </head>
 <body>
 
@@ -105,8 +117,12 @@
             };
         </script>
     }
+
     <h1>إدارة الـ HR</h1>
+
+
     <div class="container">
+        <a asp-action="Index" class="back-btn">رجوع</a>
         <a asp-action="AddHR" class="add-btn">إضافة HR</a>
         <table>
             <thead>
