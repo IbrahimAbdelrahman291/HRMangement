@@ -1,4 +1,8 @@
-﻿<html lang="ar">
+﻿@{
+    ViewData["Title"] = "Index";
+    var message = ViewBag.Message;
+}
+<html lang="ar">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,6 +59,7 @@
             width: fit-content;
             transition: opacity 0.5s;
             opacity: 1;
+            z-index: 9999;
         }
 
         .container {
@@ -116,14 +121,14 @@
     @if (ViewBag.Message != null)
     {
         <div id="message-box" class="message-box">
-            @ViewBag.Message
+            @message
         </div>
         ViewBag.Message = null;
     }
 
     <div class="info-box">
         <h3>تعليمات:</h3>
-        <p>نرجو منكم التسجيل في موعد الدخول والانصراف المحدد لكم لعدم حدوث اي ضرر لكم مثل عد احتساب ساعات العمل اذا نسيتم انهاء الشيفت.</p>
+        <p>نرجو منكم التسجيل في موعد الدخول والانصراف المحدد لكم لعدم حدوث اي ضرر لكم مثل عدم احتساب ساعات العمل اذا نسيتم انهاء الشيفت.</p>
     </div>
 
     <h1>شيفتي</h1>
@@ -149,5 +154,11 @@
             <a asp-action="MyResignationRequest" asp-route-employeeId="@TempData["EmployeeId"]">اداره الاستقالات</a>
         </div>
     </div>
+    <footer style="margin-top: 50px; text-align: center; padding: 15px; background-color: #f4f4f4; color: #555; font-size: 14px;">
+        © Copyright
+        <a href="https://opshan.github.io/home" target="_blank" style="color: #007bff; text-decoration: none;">
+            Opshan
+        </a>
+    </footer>
 </body>
 </html>

@@ -26,8 +26,13 @@ namespace HRManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllEmployees(string? BranchName = null)
         {
-            var CurrentMonth = DateTime.UtcNow.Month;
-            var CurrentYear = DateTime.UtcNow.Year;
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+
+            var CurrentMonth = egyptDate.Month;
+            var CurrentYear = egyptDate.Year;
 
             var employees = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec(CurrentMonth, CurrentYear, BranchName));
             var MappedEmployess = _mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeViewModel>>(employees);

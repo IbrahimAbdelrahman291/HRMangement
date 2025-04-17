@@ -33,6 +33,7 @@
                 text-decoration: none;
                 border-radius: 8px;
                 font-size: 1rem;
+                margin-left: 10px;
             }
 
         .resignation-table {
@@ -110,6 +111,7 @@
     <h2>طلبات الاستقالة المعلقة</h2>
 
     <div class="top-btn-container">
+        <a asp-action="Index" method="get" style="background-color: #3498db;">رجوع</a>
         <a asp-action="GetResignationsArchive" method="get">الأرشيف</a>
     </div>
 
@@ -126,30 +128,27 @@
             </tr>
         </thead>
         <tbody>
-            @{
-                
-                foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.EmployeeName</td>
-                        <td>@item.ResignationDate</td>
-                        <td>@item.Status</td>
-                        <td>@item.ReasonOfResignation</td>
-                        <td>@item.ReasonOfRejection</td>
-                        <td>
-                            <form asp-action="ApproveResignation" method="get">
-                                <input type="hidden" name="Id" value="@item.Id" />
-                                <button type="submit" class="bg-red-500">قبول</button>
-                            </form>
-                        </td>
-                        <td>
-                            <form asp-action="RejectResignation" method="get">
-                                <input type="hidden" name="Id" value="@item.Id" />
-                                <button type="submit" class="bg-red-500">رفض</button>
-                            </form>
-                        </td>
-                    </tr>
-                }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.EmployeeName</td>
+                    <td>@item.ResignationDate</td>
+                    <td>@item.Status</td>
+                    <td>@item.ReasonOfResignation</td>
+                    <td>@item.ReasonOfRejection</td>
+                    <td>
+                        <form asp-action="ApproveResignation" method="get">
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <button type="submit" class="action-btn accept-btn">قبول</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form asp-action="RejectResignation" method="get">
+                            <input type="hidden" name="Id" value="@item.Id" />
+                            <button type="submit" class="action-btn reject-btn">رفض</button>
+                        </form>
+                    </td>
+                </tr>
             }
         </tbody>
     </table>

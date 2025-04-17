@@ -88,13 +88,19 @@
             font-size: 14px;
             cursor: pointer;
             transition: background-color 0.3s;
-            float: right;
             margin-bottom: 15px;
         }
 
             .archive-button:hover {
                 background-color: #2563eb;
             }
+
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
     </style>
     <script>
         window.onload = function () {
@@ -119,9 +125,14 @@
     <div class="container">
         <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">طلبات الإجازات</h1>
 
-        <form asp-action="GetAllHolidaysArchive" method="get">
-            <button type="submit" class="archive-button">الأرشيف</button>
-        </form>
+        <div class="button-container">
+            <form asp-action="Index" method="get">
+                <button type="submit" class="archive-button" style="padding: 8px 14px;">رجوع</button>
+            </form>
+            <form asp-action="GetAllHolidaysArchive" method="get">
+                <button type="submit" class="archive-button">الأرشيف</button>
+            </form>
+        </div>
 
         <table>
             <thead>

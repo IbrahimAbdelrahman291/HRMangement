@@ -50,9 +50,41 @@
         button:hover {
             background-color: #4338ca;
         }
+
+        .message-box {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 10px auto;
+            width: fit-content;
+            transition: opacity 0.5s;
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
+    @if (ViewBag.Message != null)
+    {
+        <div id="message-box" class="message-box">@ViewBag.Message</div>
+        <script>
+            window.onload = function () {
+                var messageBox = document.getElementById('message-box');
+                if (messageBox) {
+                    setTimeout(function () {
+                        messageBox.style.display = 'none';
+
+                        fetch('/RemoveMessageController/ClearMessage', { method: 'POST' });
+                    }, 5000);
+                }
+            };
+        </script>
+    }
     <div class="login-container">
         <h2>Login</h2>
         <form asp-action="Login" method="post">

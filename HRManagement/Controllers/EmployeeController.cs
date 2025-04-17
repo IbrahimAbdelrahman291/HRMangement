@@ -75,12 +75,16 @@ namespace HRManagement.Controllers
 
             string userId = employee.UserId;
 
-            var serverDate = DateOnly.FromDateTime(DateTime.UtcNow);
-            var serverTime = TimeOnly.FromDateTime(DateTime.UtcNow);
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+            var egyptTime = TimeOnly.FromDateTime(egyptDateTime);
+
 
             var existingWorkLog = await _context.WorkLogs
-                .FirstOrDefaultAsync(w => w.EmployeeId == employeeId && w.Day == serverDate);
-
+                .FirstOrDefaultAsync(w => w.EmployeeId == employeeId && w.Day == egyptDate);
+            //مينفعش نمنعه يسجل تاني لو هو سجل امبارح وحاول يسجل تاني انهارده لان ممكن يكون شيفت صباحي ف يبقا كدا الناس بتاعت الشيفت المسائي هما اللي ياخدو بالهم وهما بنهمو الشيفت
             if (existingWorkLog != null)
             {
                 TempData.Keep("EmployeeId");
@@ -90,8 +94,8 @@ namespace HRManagement.Controllers
             var newWorkLog = new WorkLogs
             {
                 EmployeeId = employeeId,
-                Day = serverDate,
-                Start = serverTime
+                Day = egyptDate,
+                Start = egyptTime
             };
 
             await _context.WorkLogs.AddAsync(newWorkLog);
@@ -108,7 +112,7 @@ namespace HRManagement.Controllers
             if (TempData["EmployeeId"] == null || !int.TryParse(TempData["EmployeeId"].ToString(), out int employeeId))
             {
                 TempData.Keep("EmployeeId");
-                return RedirectToAction("ManageJob");
+                return RedirectToAction("ManageJob", new { message = "خطأ: لم يتم تحديد الموظف بشكل صحيح." });
             }
 
             var employee = await _context.Employees.FirstOrDefaultAsync(e => e.Id == employeeId);
@@ -117,43 +121,47 @@ namespace HRManagement.Controllers
                 TempData.Keep("EmployeeId");
                 return NotFound("Employee not found in the database.");
             }
-
-            string userId = employee.UserId; 
-
-            var serverDate = DateOnly.FromDateTime(DateTime.UtcNow);
-            var serverTime = TimeOnly.FromDateTime(DateTime.UtcNow);
-
-            var workLog = await _context.WorkLogs
-                .FirstOrDefaultAsync(w => w.EmployeeId == employeeId
-                                          && w.Day == serverDate
-                                          && w.End == TimeOnly.MinValue);
-
-            if (workLog == null)
-            {
-                TempData["EmployeeId"] = employeeId;
-                TempData.Keep("EmployeeId");
-                return RedirectToAction("ManageJob");
-            }
-
+            string userId = employee.UserId;
             try
             {
-                workLog.End = serverTime;
-                var totalWorkTime = serverTime.ToTimeSpan() - workLog.Start.ToTimeSpan();
+            
+                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+                var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+                var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+                var egyptTime = TimeOnly.FromDateTime(egyptDateTime);
+
+                var workLog = await _context.WorkLogs
+                    .FirstOrDefaultAsync(w => w.EmployeeId == employeeId
+                                              && w.Day == egyptDate
+                                              && w.End == TimeOnly.MinValue);
+                
+                if (workLog == null)
+                {
+                    var previousDate = egyptDate.AddDays(-1);
+                    workLog = await _context.WorkLogs.FirstOrDefaultAsync(w => w.EmployeeId == employeeId && w.Day == previousDate && w.End == TimeOnly.MinValue);
+                    if (workLog == null)
+                    {
+                        TempData["EmployeeId"] = employeeId;
+                        TempData.Keep("EmployeeId");
+                        return RedirectToAction("ManageJob", new { message = "لا يوجد تسجيل حضور في هذا اليوم او اليوم الذي يسبقه" });
+                    }
+                }
+
+            
+                workLog.End = egyptTime;
+                var totalWorkTime = egyptTime.ToTimeSpan() - workLog.Start.ToTimeSpan();
+                if (totalWorkTime < TimeSpan.Zero) 
+                {
+                    totalWorkTime += TimeSpan.FromHours(24);
+                }
                 workLog.TotalTime = totalWorkTime;
 
                 var employeeData = await _context.MonthlyEmployeeData
                                                  .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
                 if (employeeData != null)
                 {
-                    employeeData.Hours += totalWorkTime.TotalHours;
-                    if (employeeData.Hours == null)
-                    {
-                        employeeData.Hours = totalWorkTime.TotalHours;
-                    }
-                    else
-                    {
-                        employeeData.Hours += totalWorkTime.TotalHours;
-                    }
+                    employeeData.Hours = (employeeData.Hours ?? 0) + totalWorkTime.TotalHours;
                     _monthlyEmpData.Update(employeeData);
                 }
                 int Result = await _monthlyEmpData.CompleteAsync();
@@ -172,7 +180,7 @@ namespace HRManagement.Controllers
             TempData["EmployeeId"] = employeeId;
             TempData.Keep("EmployeeId");
 
-            return RedirectToAction("Index", new { userId = userId });
+            return RedirectToAction("Index", new { userId = userId , message = "تعذر انهاء الشيفت"});
         }
         [HttpGet]
         public async Task<IActionResult> MyData()

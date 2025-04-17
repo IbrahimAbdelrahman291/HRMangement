@@ -16,8 +16,9 @@ namespace HRManagement.Controllers
             _userManager = userManager;
             _signInManager = signInManager;
         }
-        public IActionResult Index()
+        public IActionResult Index(string? message)
         {
+            ViewBag.Message = message;
             return View();
         }
         [HttpPost]
@@ -31,13 +32,13 @@ namespace HRManagement.Controllers
             var user = await _userManager.FindByNameAsync(userName);
             if (user == null)
             {
-                return RedirectToAction("Index", "Auth");
+                return RedirectToAction("Index", new { message = "هذا المستخدم غير موجود بالسيستم" });
             }
 
             var result = await _signInManager.PasswordSignInAsync(user, password, false, false);
             if (!result.Succeeded)
             {
-                return RedirectToAction("Index", "Auth");
+                return RedirectToAction("Index", new { message = "هناك خطأ في كلمه المرور او اسم المستخدم" });
             }
 
             if (await _userManager.IsInRoleAsync(user, "Admin"))
@@ -62,7 +63,7 @@ namespace HRManagement.Controllers
                 return RedirectToAction("Index", "BranchManager");
             }
 
-            return RedirectToAction("Index", "Auth");
+            return RedirectToAction("Index", new { message = "هناك خطأ في كلمه المرور او اسم المستخدم" });
         }
         [HttpPost]
         [Authorize]

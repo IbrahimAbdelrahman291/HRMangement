@@ -66,32 +66,46 @@
             button:hover {
                 background-color: #c0392b;
             }
+
+        .back-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+            .back-btn:hover {
+                background-color: #0056b3;
+            }
     </style>
 </head>
 <body>
     <div class="container">
         <h2 class="title">رفض طلب الإجازة</h2>
         <form asp-action="RejectRequest" method="post">
-            <div class="form-group">
-                <label>اسم الموظف:</label>
-                <input type="text" value="@Model.EmployeeName" readonly>
-            </div>
-            <div class="form-group">
-                <label>تاريخ الإجازة:</label>
-                <input type="text" value="@Model.HolidayDate.ToString("yyyy-MM-dd")" readonly>
-            </div>
-            <div class="form-group">
-                <label>سبب الإجازة:</label>
-                <textarea readonly>@Model.ReasonOfHoliday</textarea>
-            </div>
-            <div class="form-group">
-                <label>سبب الرفض:</label>
-                <textarea name="ReasonOfReject" required></textarea>
-            </div>
+            
+            <label asp-for="EmployeeName">اسم الموظف</label>
+            <input asp-for="EmployeeName" type="text" value="@Model.EmployeeName" readonly />
+            
+            <label asp-for="HolidayDate">تاريخ الاجازه</label>
+            <input asp-for="HolidayDate" type="text" value="@Model.HolidayDate" readonly />
+
+            <label asp-for="ReasonOfHoliday">سبب الاجازه</label>
+            <input asp-for="ReasonOfHoliday" type="text" value="@Model.ReasonOfHoliday" readonly />
+
+            <label asp-for="ReasonOfRejection">سبب الرفض</label>
+            <input asp-for="ReasonOfRejection" type="text" rows ="4" placeholder="ادخل سبب الرفض هنا..." required />
+
             <input type="hidden" name="Id" value="@Model.Id" />
             <input type="hidden" name="EmployeeId" value="@Model.EmployeeId" />
             <button type="submit">رفض</button>
         </form>
+        <a asp-action="GetAllHolidaysRequests" class="back-btn">رجوع</a>
     </div>
 </body>
 </html>

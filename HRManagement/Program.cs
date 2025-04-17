@@ -2,6 +2,7 @@ using BLL.Interfaces;
 using BLL.Repositories;
 using DAL.Context;
 using DAL.Models;
+using Hangfire;
 using HRManagement.Helper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -17,12 +18,14 @@ namespace HRManagement
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            //builder.Services.AddControllersWithViews();
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddAutoMapper(typeof(MappingProfile));
+            builder.Services.AddScoped<IMonthlyData, MonthlyData>();
+            
+            //Connection to the database
             builder.Services.AddDbContext<HRDbContext>(options =>
             { options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")); });
-
+            //Identity configuration
             builder.Services.AddIdentity<User, IdentityRole>(Options => 
             {
                 Options.Password.RequiredLength = 1;
@@ -38,6 +41,14 @@ namespace HRManagement
                 options.SlidingExpiration = true;
             });
             builder.Services.AddAuthentication();
+            //hangfire configuration
+            builder.Services.AddHangfire(configuration =>
+            {
+                configuration.UseSqlServerStorage(
+                    builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+            builder.Services.AddHangfireServer();
+            
             var app = builder.Build();
             using (var scope = app.Services.CreateScope())
             {
@@ -55,7 +66,12 @@ namespace HRManagement
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
+            app.UseHangfireDashboard();
+            RecurringJob.AddOrUpdate<IMonthlyData>(
+                "start-new-month-job",
+                    service => service.NewMonthlyData(),
+                    "0 0 1 * *" // CRON expression: ??? 1 ?? ?? ???
+            );
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 

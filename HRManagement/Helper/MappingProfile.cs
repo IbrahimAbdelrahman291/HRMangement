@@ -70,6 +70,11 @@ namespace HRManagement.Helper
 
             CreateMap<ResignationRequestsViewModel, ResignationRequests>()
                 .ForMember(dest => dest.Employee, opt => opt.Ignore());
+            // WorkLogs Mapping
+            CreateMap<WorkLogs, WorkLogsViewModel>()
+            .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name));
+
+            CreateMap<WorkLogsViewModel, WorkLogs>();
         }
     }
 }

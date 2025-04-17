@@ -51,17 +51,30 @@
             color: white;
         }
 
-        .btn-secondary {
-            background-color: #6c757d;
+        .btn-secondary-link {
+            background-color: #007bff;
             color: white;
-            margin-right: 10px;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
         }
+
+            .btn-secondary-link:hover {
+                background-color: #0056b3;
+            }
 
         .buttons {
             display: flex;
             justify-content: center;
             gap: 10px;
             margin-top: 20px;
+        }
+
+        .back-link-container {
+            text-align: center;
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -108,9 +121,12 @@
                 <button type="submit" class="btn btn-primary">حفظ التعديل</button>
             </div>
         </form>
-        <a asp-action="GetAllEmployees" asp-route-month="@Model.Month" asp-route-year="@Model.Year" class="btn btn-secondary">
-            رجوع
-        </a>
+
+        <div class="back-link-container">
+            <a asp-action="GetAllEmployees" asp-route-month="@Model.Month" asp-route-year="@Model.Year" class="btn-secondary-link">
+                رجوع
+            </a>
+        </div>
     </div>
 </body>
 </html>

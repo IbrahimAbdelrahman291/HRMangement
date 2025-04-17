@@ -34,8 +34,13 @@ namespace HRManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllEmployees(int? month = null, int? year = null,string? BranchName = null,string? message = null)
         {
-            var currentMonth = month ?? DateTime.UtcNow.Month;
-            var currentYear = year ?? DateTime.UtcNow.Year;
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+
+            var currentMonth = month ?? egyptDate.Month;
+            var currentYear = year ?? egyptDate.Year;
 
 
             var employees = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec(currentMonth, currentYear, BranchName));
@@ -315,6 +320,55 @@ namespace HRManagement.Controllers
             }
 
             return RedirectToAction("GetAllBranchesManager", new { message = "حدث خطأ غير معروف" });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllUsers(string? userName = null,string? message = null)
+        {
+            var users = await _userManager.Users.ToListAsync();
+            if(userName != null) 
+            {
+                users = users.Where(u => u.UserName.Contains(userName)).ToList();
+            }
+            ViewBag.Message = message;
+            return View(users);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ResetPassword(string userName) 
+        {
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return RedirectToAction("GetAllUsers", new { message = "لم يتم العثور على المستخدم" });
+            }
+            return View(user);
+        }
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(string userName, string newPassword)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByNameAsync(userName);
+                if (user == null)
+                {
+                    return RedirectToAction("GetAllUsers", new { message = "لم يتم العثور على المستخدم" });
+                }
+
+                await _userManager.RemovePasswordAsync(user);
+
+                var result = await _userManager.AddPasswordAsync(user, newPassword);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("GetAllUsers", new { message = "تم اعاده تعيين كلمه المرور بنجاح" });
+                }
+                else
+                {
+                    return RedirectToAction("GetAllUsers", new { message = "حدث خطأ في اعاده تعيين كلمه المرور" });
+                }
+            }
+            return View(userName);
+
         }
     }
 }

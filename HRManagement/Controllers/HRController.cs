@@ -16,15 +16,17 @@ namespace HRManagement.Controllers
     public class HRController : Controller
     {
         private readonly IMapper _mapper;
+        private readonly IGenericRepository<WorkLogs> _worklogsRepo;
         private readonly IGenericRepository<Employee> _empRepo;
         private readonly IGenericRepository<MonthlyEmployeeData> _monthlyEmpRepo;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly HRDbContext _context;
 
-        public HRController(IMapper mapper, IGenericRepository<Employee> EmpRepo, IGenericRepository<MonthlyEmployeeData> MonthlyEmpRepo, UserManager<User> userManager, RoleManager<IdentityRole> roleManager,HRDbContext context)
+        public HRController(IMapper mapper, IGenericRepository<WorkLogs> worklogsRepo, IGenericRepository<Employee> EmpRepo, IGenericRepository<MonthlyEmployeeData> MonthlyEmpRepo, UserManager<User> userManager, RoleManager<IdentityRole> roleManager,HRDbContext context)
         {
             _mapper = mapper;
+            _worklogsRepo = worklogsRepo;
             _empRepo = EmpRepo;
             _monthlyEmpRepo = MonthlyEmpRepo;
             _userManager = userManager;
@@ -151,8 +153,13 @@ namespace HRManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllEmployees(int? month = null, int? year = null, string? BranchName = null,string? message = null)
         {
-           var currentMonth = month ?? DateTime.UtcNow.Month;
-            var currentYear = year ?? DateTime.UtcNow.Year;
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+
+            var currentMonth = month ?? egyptDate.Month;
+            var currentYear = year ?? egyptDate.Year;
 
             ViewBag.CurrentMonth = currentMonth;
             ViewBag.CurrentYear = currentYear;
@@ -165,7 +172,7 @@ namespace HRManagement.Controllers
                 var totalDiscounts = _context.Discounts.Where(d => d.MonthlyEmployeeDataId == employee.MonthlyEmployeeDataId).Sum(b => b.Amount);
                 var totalBounss = _context.Bounss.Where(d => d.MonthlyEmployeeDataId == employee.MonthlyEmployeeDataId).Sum(b => b.Amount);
                 var totalBorrows = _context.Borrows.Where(d => d.MonthlyEmployeeDataId == employee.MonthlyEmployeeDataId).Sum(b => b.Amount);
-
+                
                 if (employee?.Role.ToLower() == "static")
                 {
                     employee.NetSalary = (employee.TotalSalary + totalBounss)
@@ -184,14 +191,19 @@ namespace HRManagement.Controllers
                     employee.TotalSalary = ((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0) + (employee.ForgetedHours??0))  * employee.SalaryPerHour;
 
                 }
+                if (employee.Holidaies == null)
+                {
+                    employee.Holidaies = 7;
+                }
 
                 var monthlyData = await _context.MonthlyEmployeeData
                     .FirstOrDefaultAsync(m => m.EmployeeId == employee.Id && m.Month == currentMonth && m.Year == currentYear);
-
+                
                 if (monthlyData != null)
                 {
                     monthlyData.NetSalary = employee.NetSalary;
                     monthlyData.TotalSalary = employee.TotalSalary;
+                    monthlyData.Holidaies = employee.Holidaies;
                     _context.MonthlyEmployeeData.Update(monthlyData);
                 }
             }
@@ -211,66 +223,6 @@ namespace HRManagement.Controllers
             ViewBag.Message = message;
             return View(MappedEmployess2);
         }
-
-        [HttpPost]
-        public async Task<IActionResult> StartNewMonth() 
-        {
-            var prevMonth = DateTime.UtcNow.Month;
-            var prevYear = DateTime.UtcNow.Year;
-            string? BankName = null;
-            if (prevMonth > 1)
-            {
-                prevMonth -= 1;
-            }
-            else
-            {
-                prevMonth = 12;
-                prevYear -= 1;
-            }
-            var employees = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec(prevMonth, prevYear,BankName));
-            var MappedEmployess = _mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeViewModel>>(employees);
-
-            foreach (var item in MappedEmployess)
-            {
-                var totalDiscounts = _context.Discounts.Where(d => d.MonthlyEmployeeDataId == item.MonthlyEmployeeDataId);
-                foreach (var item1 in totalDiscounts)
-                {
-                    _context.Remove(item1);
-                }
-                var totalBounss = _context.Bounss.Where(d => d.MonthlyEmployeeDataId == item.MonthlyEmployeeDataId);
-                foreach (var item2 in totalBounss)
-                {
-                    _context.Remove(item2);
-                }
-                var totalBorrows = _context.Borrows.Where(d => d.MonthlyEmployeeDataId == item.MonthlyEmployeeDataId);
-                foreach (var item3 in totalBorrows)
-                {
-                    _context.Remove(item3);
-                }
-                var newMonthlyData = new MonthlyEmployeeData
-                {
-                    EmployeeId = item.Id,
-                    Month = DateTime.UtcNow.Month,
-                    Year = DateTime.UtcNow.Year,
-                    SalaryPerHour = item.SalaryPerHour,
-                    TotalSalary = item.TotalSalary,
-                    Holidaies = 7
-                };
-                await _monthlyEmpRepo.AddAsync(newMonthlyData);
-                
-            }
-            int result = await _context.SaveChangesAsync();
-            if (result > 0)
-            {
-                return RedirectToAction("GetAllEmployees", new { message = "تم انشاء شهر جديد بنجاح" });
-            }
-            else
-            {
-                return RedirectToAction("GetAllEmployees", new { message = "حدث خطأ في انشاء شهر جديد" });
-            }
-
-        }
-
         [HttpGet]
         public async Task<IActionResult> UpdateEmployee(int id, int? month = null, int? year = null)
         {
@@ -372,7 +324,6 @@ namespace HRManagement.Controllers
             ViewBag.Message = message;
             return View(MappedRequests);
         }
-
         [HttpGet]
         public async Task<IActionResult> ApproveRequest(int id)
         {
@@ -463,7 +414,7 @@ namespace HRManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> RejectRequest(HolidayRequestViewModel model) 
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var request = await _context.HolidayRequests.FindAsync(model.Id);
                 if (request == null)
@@ -474,8 +425,8 @@ namespace HRManagement.Controllers
                 request.status = "مرفوض";
                 request.ReasonOfRejection = model.ReasonOfRejection;
                 _context.HolidayRequests.Update(request);
+                int Result = await _context.SaveChangesAsync();
 
-                int Result = await _empRepo.CompleteAsync();
                 if (Result > 0)
                 {
                     return RedirectToAction("GetAllHolidaysRequests", new { message = "تم الرفض على الطلب" });
@@ -483,7 +434,6 @@ namespace HRManagement.Controllers
             }
             return View(model);
         }
-
         [HttpGet]
         public IActionResult GetAllDiscounts(int monthlyEmployeeDataId)
         {
@@ -568,7 +518,6 @@ namespace HRManagement.Controllers
 
             return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = MonthlyDataId });
         }
-
         [HttpGet]
         public IActionResult AddDiscount(int monthlyEmployeeDataId)
         {
@@ -593,7 +542,6 @@ namespace HRManagement.Controllers
 
             return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
         }
-
         [HttpGet]
         public IActionResult AddBouns(int monthlyEmployeeDataId)
         {
@@ -642,7 +590,6 @@ namespace HRManagement.Controllers
 
             return RedirectToAction("GetAllBorrows", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
         }
-
         [HttpGet]
         public IActionResult GetAllPendResignations(string? message) 
         {
@@ -666,7 +613,6 @@ namespace HRManagement.Controllers
             var mappedResignations = _mapper.Map<List<ResignationRequestsViewModel>>(resignations);
             return View(mappedResignations);
         }
-
         [HttpGet]
         public async Task<IActionResult> ApproveResignation(int id)
         {
@@ -705,7 +651,6 @@ namespace HRManagement.Controllers
             }
             return View(model);
         }
-
         [HttpGet]
         public async Task<IActionResult> RejectResignation(int id)
         {
@@ -744,6 +689,54 @@ namespace HRManagement.Controllers
                 }
             }
             return View(model);
+        }
+        // atenddance report
+        [HttpGet]
+        public async Task<IActionResult> GetAttendanceReport(DateTime? date)
+        {
+            DateOnly currentDate;
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+
+            if (date == null)
+            {
+                currentDate = egyptDate;
+            }
+            else 
+            {
+                currentDate = DateOnly.FromDateTime(date.Value);
+            }
+            var AllAttendee = await _worklogsRepo.GetAllWithSpecAsync(new WorkLogsSpec(currentDate));
+            var MappedAttendee = _mapper.Map<IEnumerable<WorkLogsViewModel>>(AllAttendee);
+            TempData["Date"] = date;
+            TempData.Keep("Date");
+            return View(MappedAttendee);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetForgetedAttendeeThatEndShift(DateTime? date)
+        {
+            DateOnly currentDate;
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+
+            if (date == null)
+            {
+                currentDate = egyptDate;
+            }
+            else
+            {
+                currentDate = DateOnly.FromDateTime(date.Value);
+            }
+            var AllAttendee = await _worklogsRepo.GetAllWithSpecAsync(new WorkLogsSpec(currentDate));
+            var MappedAttendee = _mapper.Map<IEnumerable<WorkLogsViewModel>>(AllAttendee);
+            var Result = MappedAttendee.Where(w => w.End == TimeOnly.MinValue);
+            TempData["Date"] = date;
+            TempData.Keep("Date");
+            return View(Result);
         }
     }
 }

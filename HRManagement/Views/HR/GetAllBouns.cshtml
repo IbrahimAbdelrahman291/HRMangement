@@ -70,11 +70,30 @@
         .add-btn {
             margin-bottom: 15px;
         }
+
+        .back-btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+            .back-btn:hover {
+                background-color: #0056b3;
+            }
+
     </style>
 </head>
 <body>
     <div class="container">
         <h1>عرض البونصات للموظف: @ViewBag.EmployeeName</h1>
+        <div class="top-bar">
+            <a asp-action="GetAllEmployees" class="back-btn">رجوع</a>
+        </div>
+
         <form asp-action="AddBouns" method="get">
             <input type="hidden" name="MonthlyEmployeeDataId" value="@TempData["MonthlyEmployeeDataId"]" />
         <button type="submit">اضافه بونص</button>

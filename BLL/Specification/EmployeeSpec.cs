@@ -13,8 +13,14 @@ namespace BLL.Specification
 
         public EmployeeSpec(int id, int? month = null, int? year = null) : base(e => e.Id == id)
         {
-            var currentMonth = month ?? DateTime.Now.Month;
-            var currentYear = year ?? DateTime.Now.Year;
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+
+            var currentMonth = month ?? egyptDate.Month;
+            var currentYear = year ?? egyptDate.Year;
+
 
             AddFilter(e => e.MonthlyData.Any(m => m.Month == currentMonth && m.Year == currentYear));
 
@@ -23,8 +29,13 @@ namespace BLL.Specification
 
         public EmployeeSpec(int? month = null, int? year = null, string? branchName = null)
         {
-            var currentMonth = month ?? DateTime.Now.Month;
-            var currentYear = year ?? DateTime.Now.Year;
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+
+            var currentMonth = month ?? egyptDate.Month;
+            var currentYear = year ?? egyptDate.Year;
 
             Criteria = e => e.MonthlyData.Any(m =>
                 (month == null || m.Month == currentMonth) &&

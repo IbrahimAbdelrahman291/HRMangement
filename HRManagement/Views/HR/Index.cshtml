@@ -188,12 +188,16 @@
             <a asp-action="GetAllPendResignations">عرض الطلبات</a>
         </div>
         <div class="card">
-            <h2>بدايه شهر جديد</h2>
-            <p><strong>نرجو منكم عدم بدايه شهر جديد في وقت شيفت او قبل الشهر نهايه الشهر بدقيقه حتى</strong></p>
-            <form asp-action="StartNewMonth" method="post">
-                <button id="test" type="submit">بدايه</button>
-            </form>
+            <h2>تقرير الحضور والانصراف</h2>
+            <p>عرض جميع عمليات الحضور والانصراف المكتمله والمنسيه</p>
+            <a asp-action="GetAttendanceReport">عرض التقرير</a>
         </div>
     </div>
+    <footer style="margin-top: 50px; text-align: center; padding: 15px; background-color: #f4f4f4; color: #555; font-size: 14px;">
+        © Copyright
+        <a href="https://opshan.github.io/home" target="_blank" style="color: #007bff; text-decoration: none;">
+            Opshan
+        </a>
+    </footer>
 </body>
 </html>

@@ -71,11 +71,27 @@
             border: 1px solid #ddd;
             width: 150px;
         }
+
+        .btn-back {
+            background-color: #007bff;
+            padding: 5px 15px;
+            font-size: 14px;
+            border-radius: 5px;
+            text-decoration: none;
+            color: white;
+            display: inline-block;
+        }
+
+            .btn-back:hover {
+                background-color: #0056b3;
+            }
     </style>
 </head>
 <body>
     <h1>جدول الموظفين</h1>
-
+    <div style="text-align: right; margin-bottom: 10px;">
+        <a asp-action="Index" class="btn btn-back">رجوع</a>
+    </div>
     <div class="container">
         <form method="get" asp-action="GetAllEmployees" class="filter-form">
             <input type="number" name="month" placeholder="الشهر" min="1" max="12" value="@ViewBag.CurrentMonth" />

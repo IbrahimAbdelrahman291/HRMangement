@@ -6,6 +6,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Add Employee</title>
@@ -56,7 +57,23 @@
         .dynamic-field {
             display: none;
         }
+
+        .back-button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .back-container {
+            text-align: center;
+        }
     </style>
+
     <script>
         function handleRoleChange() {
             const role = document.getElementById('Role').value;
@@ -95,7 +112,7 @@
 
         <div>
             <label for="Role">الدور</label>
-            <select asp-for="Role" required onchange="handleRoleChange()">
+            <select asp-for="Role" required onchange="handleRoleChange()" id="Role">
                 <option value="">اختيار</option>
                 <option value="static">ثابت</option>
                 <option value="changable">متغير</option>
@@ -129,6 +146,10 @@
         </div>
 
         <button type="submit">اضافه</button>
+
+        <div class="back-container">
+            <a asp-action="Index" class="back-button">رجوع</a>
+        </div>
     </form>
 
 </body>
