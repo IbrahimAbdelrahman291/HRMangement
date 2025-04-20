@@ -1,4 +1,4 @@
-﻿@model IEnumerable<User>
+﻿@model List<ResetPassWordViewModel>
 @{
     ViewData["Title"] = "GetAllUsers";
 }
@@ -23,6 +23,7 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 25px;
+            flex-wrap: wrap;
         }
 
         .search-form {
@@ -31,6 +32,7 @@
             align-items: center;
             gap: 10px;
             flex-grow: 1;
+            margin-top: 10px;
         }
 
             .search-form input {
@@ -38,6 +40,14 @@
             }
 
         .back-button {
+            white-space: nowrap;
+            padding: 5px 12px;
+            font-size: 14px;
+            height: fit-content;
+        }
+
+        .export-button {
+            margin-right: 10px;
             white-space: nowrap;
             padding: 5px 12px;
             font-size: 14px;
@@ -86,27 +96,28 @@
                 if (messageBox) {
                     setTimeout(function () {
                         messageBox.style.display = 'none';
-
-                        // بعد إخفاء الرسالة، ابعت الـ fetch لتمسحها
                         fetch('/RemoveMessageController/ClearMessage', { method: 'POST' });
                     }, 5000);
                 }
             };
         </script>
     }
+
     <div class="top-bar">
         <a asp-action="Index" class="btn btn-primary back-button">رجوع</a>
 
         <form asp-action="GetAllUsers" method="get" class="search-form">
             <input type="text" name="userName" class="form-control" placeholder="ابحث باسم المستخدم" />
             <button type="submit" class="btn btn-secondary">بحث</button>
+            <button type="button" class="btn btn-success export-button" onclick="exportTableToExcel('userTable', 'UsersList')">تصدير إلى Excel</button>
         </form>
     </div>
 
     <div class="table-container">
-        <table class="table table-bordered">
+        <table id="userTable" class="table table-bordered">
             <thead>
                 <tr>
+                    <th>اسم الموظف</th>
                     <th>اسم المستخدم</th>
                     <th>تعديل كلمة السر</th>
                 </tr>
@@ -115,6 +126,7 @@
                 @foreach (var user in Model)
                 {
                     <tr>
+                        <td>@user.Name</td>
                         <td>@user.UserName</td>
                         <td>
                             <a asp-action="ResetPassword" asp-route-userName="@user.UserName" class="btn btn-warning">تعديل كلمة السر</a>
@@ -125,5 +137,26 @@
         </table>
     </div>
 
+    <script>
+        function exportTableToExcel(tableID, filename = '') {
+            var downloadLink;
+            var dataType = 'application/vnd.ms-excel';
+            var tableSelect = document.getElementById(tableID);
+            var tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+
+            filename = filename ? filename + '.xls' : 'excel_data.xls';
+            downloadLink = document.createElement("a");
+            document.body.appendChild(downloadLink);
+
+            if (navigator.msSaveOrOpenBlob) {
+                var blob = new Blob(['\ufeff', tableHTML], { type: dataType });
+                navigator.msSaveOrOpenBlob(blob, filename);
+            } else {
+                downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+                downloadLink.download = filename;
+                downloadLink.click();
+            }
+        }
+    </script>
 </body>
 </html>

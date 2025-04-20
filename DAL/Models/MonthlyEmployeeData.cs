@@ -17,8 +17,13 @@ namespace DAL.Models
         public double? Hours { get; set; }
         public double? HoursOverTime { get; set; }
         public double? ForgetedHours { get; set; }
+        public double? Target { get; set; }
         public double? SalaryPerHour { get; set; }
         public double? TotalSalary { get; set; }
+        public double? TotalDiscounts { get; set; }
+        public double? TotalBouns { get; set; }
+        public double? TotalBorrows { get; set; }
+
         public int? Holidaies { get; set; }
         public double? NetSalary { get; set; }
 

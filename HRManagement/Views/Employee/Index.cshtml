@@ -67,6 +67,7 @@
             justify-content: center;
             gap: 20px;
             margin-top: 30px;
+			flex-wrap: wrap;
         }
 
         .card {
@@ -152,6 +153,16 @@
             <h2>الاستقالات</h2>
             <p>تقديم استقاله ونتائج الاستقالات</p>
             <a asp-action="MyResignationRequest" asp-route-employeeId="@TempData["EmployeeId"]">اداره الاستقالات</a>
+        </div>
+        <div class="card">
+            <h2>الشيفتات المنسيه</h2>
+            <p>تقديم طلب لاغلاق شيفت منسي</p>
+            <a asp-action="GetAllRequestsForFogetCloseShift" asp-route-employeeId="@TempData["EmployeeId"]">تقديم</a>
+        </div>
+        <div class="card">
+            <h2>السلف</h2>
+            <p>تقديم طلب سلفه</p>
+            <a asp-action="GetAllRequestBorrows" asp-route-employeeId="@TempData["EmployeeId"]">تقديم</a>
         </div>
     </div>
     <footer style="margin-top: 50px; text-align: center; padding: 15px; background-color: #f4f4f4; color: #555; font-size: 14px;">

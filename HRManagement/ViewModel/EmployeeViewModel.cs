@@ -31,6 +31,11 @@ namespace HRManagement.ViewModel
         [Required]
         public int Year { get; set; }
 
+        public int Target { get; set; }
+        public double TotalBorrows { get; set; }
+        public double TotalBonuss { get; set; }
+        public double TotalDiscounts { get; set; }
+
         public double? Hours { get; set; }
         public double? HoursOverTime { get; set; }
         public double? ForgetedHours { get; set; }

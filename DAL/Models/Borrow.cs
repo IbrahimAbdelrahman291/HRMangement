@@ -12,9 +12,11 @@ namespace DAL.Models
         [ForeignKey(nameof(MonthlyEmployeeData))]
         public int MonthlyEmployeeDataId { get; set; }
         public MonthlyEmployeeData MonthlyEmployeeData { get; set; }
-        public int Amount { get; set; }
+        public double Amount { get; set; }
         public string Reason { get; set; }
         public string Notes { get; set; }
+        public int year { get; set; }
+        public int Month { get; set; }
         public DateTime DateOfBorrow { get; set; }
     }
 }

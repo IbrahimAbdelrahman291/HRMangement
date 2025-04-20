@@ -60,5 +60,7 @@ namespace DAL.Context
         public DbSet<MonthlyEmployeeData> MonthlyEmployeeData { get; set; }
         public DbSet<ResignationRequests> ResignationRequests { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<RequestForForgetCloseShift> requests { get; set; }
+        public DbSet<RequestBorrow> requestBorrows { get; set; }
     }
 }

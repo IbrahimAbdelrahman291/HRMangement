@@ -15,6 +15,10 @@ namespace HRManagement.Helper
                 .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
                 .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.BankName))
                 .ForMember(dest => dest.BankAccount, opt => opt.MapFrom(src => src.BankAccount))
+                .ForMember(dest => dest.Target, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().Target))
+                .ForMember(dest => dest.TotalBonuss, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().TotalBouns))
+                .ForMember(dest => dest.TotalBorrows, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().TotalBorrows))
+                .ForMember(dest => dest.TotalDiscounts, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().TotalDiscounts))
                 .ForMember(dest => dest.MonthlyEmployeeDataId, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().Id))
                 .ForMember(dest => dest.Month, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().Month))
                 .ForMember(dest => dest.Year, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().Year))
@@ -75,6 +79,13 @@ namespace HRManagement.Helper
             .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name));
 
             CreateMap<WorkLogsViewModel, WorkLogs>();
+
+            CreateMap<RequestForForgetCloseShift, RequestForForgetCloseShiftViewModel>()
+                .ForMember(dest => dest.EmployeeName , opt => opt.MapFrom(src => src.employee.Name));
+            CreateMap<RequestForForgetCloseShiftViewModel, RequestForForgetCloseShift>().ForMember(dest => dest.employee, opt => opt.Ignore());
+
+            CreateMap<RequestBorrow, RequestBorrowViewModel>().ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name));
+            CreateMap<RequestBorrowViewModel, RequestBorrow>().ForMember(dest => dest.Employee , opt => opt.Ignore());
         }
     }
 }

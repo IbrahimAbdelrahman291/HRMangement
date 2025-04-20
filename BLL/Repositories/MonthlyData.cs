@@ -52,6 +52,8 @@ namespace BLL.Repositories
                                 Year = egyptDate.Year,
                                 TotalSalary = EmpData.TotalSalary,
                                 Holidaies = EmpData.Holidaies,
+                                Target = EmpData.Target,
+                                
                             };
                             await _dbContext.MonthlyEmployeeData.AddAsync(newMonthlyData);
                         }
@@ -65,6 +67,8 @@ namespace BLL.Repositories
                                 SalaryPerHour = EmpData.SalaryPerHour,
                                 Holidaies = EmpData.Holidaies,
                                 TotalSalary = 0.0,
+                                Target = EmpData.Target,
+                                
                             };
                             await _dbContext.MonthlyEmployeeData.AddAsync(newMonthlyData);
                         }

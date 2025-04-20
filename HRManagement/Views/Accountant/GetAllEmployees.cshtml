@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "GetAllEmployees";
     var branchNames = ViewData["BranchNames"] as List<string> ?? new List<string>();
+    var bankNames = ViewData["BankNames"] as List<string> ?? new List<string>();
+    var Roles = ViewData["Roles"] as List<string> ?? new List<string>();
     var totalNetSalary = ViewData["TotalNetSalary"];
 }
 
@@ -73,45 +75,69 @@
             width: 150px;
         }
 
-        tfoot td {
-            font-weight: bold;
-            background-color: #f0f0f0;
-        }
-
-        .back-btn {
-            display: inline-block;
-            margin-top: 20px;
-            margin-bottom: 20px;
-            text-decoration: none;
+        .btn-back {
             background-color: #007bff;
-            color: white;
-            padding: 10px 20px;
+            padding: 5px 15px;
+            font-size: 14px;
             border-radius: 5px;
-            font-size: 16px;
+            text-decoration: none;
+            color: white;
+            display: inline-block;
         }
 
-            .back-btn:hover {
+            .btn-back:hover {
                 background-color: #0056b3;
+            }
+
+        .btn-export {
+            background-color: #28a745;
+            margin-top: 20px;
+        }
+
+            .btn-export:hover {
+                background-color: #218838;
             }
     </style>
 </head>
 <body>
     <h1>جدول الموظفين</h1>
+    <div style="text-align: right; margin-bottom: 10px;">
+        <a asp-action="Index" class="btn btn-back">رجوع</a>
+    </div>
+    <div>
+        <button class="btn btn-export" onclick="exportTableToExcel('employeeTable', 'EmployeeData')">تحميل كـ Excel</button>
+    </div>
 
     <div class="container">
-        <a asp-action="Index" class="back-btn">رجوع</a>
         <form method="get" asp-action="GetAllEmployees" class="filter-form">
+            <input type="number" name="month" placeholder="الشهر" min="1" max="12" value="@ViewBag.CurrentMonth" />
+            <input type="number" name="year" placeholder="السنة" min="2025" max="3000" value="@ViewBag.CurrentYear" />
+            <input type="text" name="Name" placeholder="الاسم" />
             <select name="BranchName">
-                <option value="">كل الفروع</option>
+                <option value="">الفروع</option>
                 @foreach (var branch in branchNames)
                 {
                     <option value="@branch">@branch</option>
                 }
             </select>
+            <select name="BankName">
+                <option value="">البنوك</option>
+                @foreach (var bank in bankNames)
+                {
+                    <option value="@bank">@bank</option>
+                }
+            </select>
+            <select name="Role">
+                <option value="">الادوار</option>
+                @foreach (var role in Roles)
+                {
+                    <option value="@role">@role</option>
+                }
+            </select>
             <button type="submit" class="btn">تطبيق الفلتر</button>
         </form>
 
-        <table>
+        <table id="employeeTable">
             <thead>
                 <tr>
                     <th>Id</th>
@@ -123,12 +149,16 @@
                     <th>الشهر</th>
                     <th>السنة</th>
                     <th>عدد الساعات</th>
+                    <th>التارجت</th>
                     <th>عدد ساعات العمل الإضافي</th>
                     <th>عدد الساعات المنسيه</th>
+                    <th>الاجازات</th>
                     <th>الراتب بالساعة</th>
                     <th>إجمالي الراتب</th>
+                    <th>اجمالي الزيادات</th>
+                    <th>اجمالي السلف</th>
+                    <th>اجمالي الخصومات</th>
                     <th>صافي المرتب</th>
-                    <th>مجموع المرتبات</th>
                 </tr>
             </thead>
             <tbody>
@@ -136,6 +166,15 @@
                 {
                     <tr>
                         <td>@employee.Id</td>
+                        <td>
+                            <form asp-action="UpdateEmployee" method="get">
+                                <input type="hidden" name="id" value="@employee.Id" />
+                                <input type="hidden" name="month" value="@employee.Month" />
+                                <input type="hidden" name="year" value="@employee.Year" />
+                                <button type="submit" class="btn">تعديل</button>
+                            </form>
+                        </td>
+                        
                         <td>@employee.Name</td>
                         <td>@employee.BranchName</td>
                         <td>@employee.Role</td>
@@ -144,12 +183,16 @@
                         <td>@employee.Month</td>
                         <td>@employee.Year</td>
                         <td>@employee.Hours</td>
+                        <td>@employee.Target</td>
                         <td>@employee.HoursOverTime</td>
                         <td>@employee.ForgetedHours</td>
+                        <td>@employee.Holidaies</td>
                         <td>@employee.SalaryPerHour</td>
                         <td>@Math.Round((double)employee.TotalSalary, 2).ToString("F2")</td>
+                        <td>@employee.TotalBonuss</td>
+                        <td>@employee.TotalBorrows</td>
+                        <td>@employee.TotalDiscounts</td>
                         <td>@Math.Round((double)employee.NetSalary, 2).ToString("F2")</td>
-                        <td></td>
                     </tr>
                 }
             </tbody>
@@ -160,6 +203,17 @@
                 </tr>
             </tfoot>
         </table>
+
+
     </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        function exportTableToExcel(tableID, filename = '') {
+            var table = document.getElementById(tableID);
+            var workbook = XLSX.utils.table_to_book(table, { sheet: "Sheet1" });
+            XLSX.writeFile(workbook, filename ? filename + '.xlsx' : 'table.xlsx');
+        }
+    </script>
 </body>
 </html>

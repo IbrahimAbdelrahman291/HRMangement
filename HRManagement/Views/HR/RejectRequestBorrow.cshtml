@@ -1,0 +1,133 @@
+﻿@model RequestBorrowViewModel
+@{
+    ViewData["Title"] = "RejectRequestBorrow";
+}
+
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>رفض الطلب</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #c0392b;
+        }
+
+        .form-container {
+            width: 60%;
+            margin: auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #f0f0f0;
+            color: #555;
+        }
+
+            input[readonly], textarea[readonly] {
+                background-color: #f0f0f0;
+                cursor: not-allowed;
+            }
+
+            textarea:not([readonly]) {
+                background-color: #fff;
+                cursor: text;
+            }
+
+        .btn-submit {
+            margin-top: 20px;
+            background-color: #e74c3c;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+            .btn-submit:hover {
+                background-color: #c0392b;
+            }
+
+        .back-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+            .back-btn:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</head>
+<body>
+
+    <h2>رفض طلب السلفه</h2>
+
+    <form asp-action="RejectRequestBorrow" method="post" class="form-container">
+        <input type="hidden" name="Id" value="@Model.Id" />
+
+        <label asp-for="EmployeeName">اسم الموظف</label>
+        <input asp-for="EmployeeName" type="text" value="@Model.EmployeeName" readonly />
+        <label asp-for="Amount">المبلغ</label>
+        <input asp-for="Amount" type="number" value="@Model.Amount" readonly />
+
+        <label asp-for="RequestDate">تاريخ الطلب</label>
+        <input asp-for="RequestDate" type="text" value="@Model.RequestDate" readonly />
+
+        <label asp-for="Status">الحاله</label>
+        <input asp-for="Status" type="text" value="@Model.Status" readonly />
+
+        <label asp-for="Reason">سبب السلفه</label>
+        <input asp-for="Reason" type="text" value="@Model.Reason" readonly />
+
+        <label asp-for="ReasonOfRejection">سبب الرفض</label>
+        <input asp-for="ReasonOfRejection" type="text" rows="4" placeholder="ادخل سبب الرفض هنا..." required />
+
+        <label asp-for="notes">ملحوظات</label>
+        <input asp-for="notes" type="text" rows="4" placeholder="ادخل ملحوظاتك هنا..." required />
+
+
+        <button type="submit" class="btn-submit">رفض الطلب</button>
+    </form>
+    <a asp-action="GetAllRequestBorrow" class="back-btn">رجوع</a>
+</body>
+</html>
+
+

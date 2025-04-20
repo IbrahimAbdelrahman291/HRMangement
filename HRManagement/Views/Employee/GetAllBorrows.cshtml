@@ -1,7 +1,6 @@
-﻿@model List<DiscountViewModel>
+﻿@model IEnumerable<BorrowViewModel>
 @{
-    ViewData["Title"] = "GetAllDiscounts";
-    TempData.Keep("MonthlyEmployeeDataId");
+    ViewData["Title"] = "GetAllBorrows";
 }
 
 <!DOCTYPE html>
@@ -9,7 +8,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>عرض الخصومات</title>
+    <title>عرض السلف</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -85,19 +84,19 @@
                 background-color: #0056b3;
             }
 
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>عرض الخصومات للموظف: @ViewBag.EmployeeName</h1>
         <div class="top-bar">
-            <a asp-action="GetAllEmployees" class="back-btn">رجوع</a>
+            <a asp-action="MyData" asp-route-employeeId="@TempData["EmployeeId"] class="back-btn">رجوع</a>
         </div>
-
-        <form asp-action="AddDiscount" method="get" class="add-btn">
-            <input type="hidden" name="MonthlyEmployeeDataId" value="@TempData["MonthlyEmployeeDataId"]" />
-            <button type="submit">اضافه خصم</button>
-        </form>
 
         <table>
             <thead>
@@ -107,24 +106,17 @@
                     <th>المبلغ</th>
                     <th>السبب</th>
                     <th>ملاحظات</th>
-                    <th>إجراء</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach (var discount in Model)
+                @foreach (var borrow in Model)
                 {
                     <tr>
-                        <td>@discount.Id</td>
-                        <td>@discount.Date</td>
-                        <td>@discount.Amount</td>
-                        <td>@discount.ReasonOfDiscount</td>
-                        <td>@discount.Notes</td>
-                        <td>
-                            <form asp-action="DeleteDiscount" method="post">
-                                <input type="hidden" name="id" value="@discount.Id"/>
-                                <button type="submit" class="btn btn-danger">حذف</button>
-                            </form>
-                        </td>
+                        <td>@borrow.Id</td>
+                        <td>@borrow.DateOfBorrow</td>
+                        <td>@borrow.Amount</td>
+                        <td>@borrow.Reason</td>
+                        <td>@borrow.Notes</td>
                     </tr>
                 }
             </tbody>
@@ -132,3 +124,4 @@
     </div>
 </body>
 </html>
+

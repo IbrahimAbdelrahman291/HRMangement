@@ -91,9 +91,38 @@
             <tr><th>الشهر</th><td>@Model.Month</td></tr>
             <tr><th>السنة</th><td>@Model.Year</td></tr>
             <tr><th>عدد الساعات</th><td>@Model.Hours</td></tr>
+            <tr><th>عدد الساعات</th><td>@Model.Target</td></tr>
             <tr><th>الساعات الإضافية</th><td>@Model.HoursOverTime</td></tr>
+            <tr><th>الساعات الإضافية</th><td>@Model.ForgetedHours</td></tr>
             <tr><th>الراتب بالساعة</th><td>@Model.SalaryPerHour</td></tr>
             <tr><th>إجمالي الراتب</th><td>@Model.TotalSalary</td></tr>
+            <tr>
+                <th>الزيادات</th>
+                <td>
+                    <form asp-action="GetAllBonus" method="get">
+                        <input type="hidden" name="employeeId" value="@Model.Id" />
+                        <button type="submit" class="btn">الزيادات</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <th>السلف</th>
+                <td>
+                    <form asp-action="GetAllBorrows" method="get">
+                        <input type="hidden" name="employeeId" value="@Model.Id" />
+                        <button type="submit" class="btn">السلف</button>
+                    </form>
+                </td>
+            </tr>
+            <tr>
+                <th>الخصومات</th>
+                <td>
+                    <form asp-action="GetAllDiscounts" method="get">
+                        <input type="hidden" name="employeeId" value="@Model.Id" />
+                        <button type="submit" class="btn">الخصومات</button>
+                    </form>
+                </td>
+            </tr>
             <tr><th>صافي المرتب</th><td>@Model.NetSalary</td></tr>
         </table>
     </div>

@@ -106,7 +106,7 @@ namespace HRManagement.Controllers
 
             return RedirectToAction("Index", new { userId = userId, message = "تم تسجيل بداية العمل بنجاح." });
         }
-
+        [HttpPost]
         public async Task<IActionResult> EndJob()
         {
             if (TempData["EmployeeId"] == null || !int.TryParse(TempData["EmployeeId"].ToString(), out int employeeId))
@@ -121,10 +121,11 @@ namespace HRManagement.Controllers
                 TempData.Keep("EmployeeId");
                 return NotFound("Employee not found in the database.");
             }
+
             string userId = employee.UserId;
+
             try
             {
-            
                 var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
                 var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
 
@@ -135,26 +136,36 @@ namespace HRManagement.Controllers
                     .FirstOrDefaultAsync(w => w.EmployeeId == employeeId
                                               && w.Day == egyptDate
                                               && w.End == TimeOnly.MinValue);
-                
+
                 if (workLog == null)
                 {
                     var previousDate = egyptDate.AddDays(-1);
-                    workLog = await _context.WorkLogs.FirstOrDefaultAsync(w => w.EmployeeId == employeeId && w.Day == previousDate && w.End == TimeOnly.MinValue);
+                    workLog = await _context.WorkLogs
+                        .FirstOrDefaultAsync(w => w.EmployeeId == employeeId
+                                                  && w.Day == previousDate
+                                                  && w.End == TimeOnly.MinValue);
+
                     if (workLog == null)
                     {
                         TempData["EmployeeId"] = employeeId;
                         TempData.Keep("EmployeeId");
-                        return RedirectToAction("ManageJob", new { message = "لا يوجد تسجيل حضور في هذا اليوم او اليوم الذي يسبقه" });
+                        return RedirectToAction("ManageJob", new { message = "لا يوجد تسجيل حضور في هذا اليوم أو اليوم الذي يسبقه" });
                     }
                 }
 
-            
                 workLog.End = egyptTime;
-                var totalWorkTime = egyptTime.ToTimeSpan() - workLog.Start.ToTimeSpan();
-                if (totalWorkTime < TimeSpan.Zero) 
+
+                DateTime startDateTime = workLog.Day.ToDateTime(workLog.Start);
+                DateTime endDateTime = egyptDateTime;
+                var totalWorkTime = endDateTime - startDateTime;
+
+                if (totalWorkTime.TotalHours >= 24)
                 {
-                    totalWorkTime += TimeSpan.FromHours(24);
+                    TempData["EmployeeId"] = employeeId;
+                    TempData.Keep("EmployeeId");
+                    return RedirectToAction("ManageJob", new { message = "تعذر تسجيل ساعاتك، يجب التواصل مع HR" });
                 }
+
                 workLog.TotalTime = totalWorkTime;
 
                 var employeeData = await _context.MonthlyEmployeeData
@@ -164,23 +175,23 @@ namespace HRManagement.Controllers
                     employeeData.Hours = (employeeData.Hours ?? 0) + totalWorkTime.TotalHours;
                     _monthlyEmpData.Update(employeeData);
                 }
-                int Result = await _monthlyEmpData.CompleteAsync();
-                if (Result > 0)
+
+                int result = await _monthlyEmpData.CompleteAsync();
+                if (result > 0)
                 {
-                    return RedirectToAction("Index", new { userId = userId, message = "تم انهاء الشيفت بنجاح"});
+                    return RedirectToAction("Index", new { userId = userId, message = "تم انهاء الشيفت بنجاح" });
                 }
             }
             catch
             {
                 TempData["EmployeeId"] = employeeId;
                 TempData.Keep("EmployeeId");
-                return RedirectToAction("ManageJob",new { message = "حدث خطأ في انهاء الشيفت" });
+                return RedirectToAction("ManageJob", new { message = "حدث خطأ في انهاء الشيفت" });
             }
 
             TempData["EmployeeId"] = employeeId;
             TempData.Keep("EmployeeId");
-
-            return RedirectToAction("Index", new { userId = userId , message = "تعذر انهاء الشيفت"});
+            return RedirectToAction("Index", new { userId = userId, message = "تعذر انهاء الشيفت" });
         }
         [HttpGet]
         public async Task<IActionResult> MyData()
@@ -331,6 +342,175 @@ namespace HRManagement.Controllers
                 TempData["EmployeeId"] = employeeId;
                 TempData.Keep("EmployeeId");
                 return RedirectToAction("Index" , new { userId = employee.UserId , message = "تم تقديم الاستقاله بنجاح" });
+            }
+            TempData.Keep("EmployeeId");
+            return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllDiscounts(int employeeId) 
+        {
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+            
+            var currentMonth = egyptDate.Month;
+            var currentYear = egyptDate.Year;
+
+            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId,currentMonth,currentYear));
+            var mappedEmployee = _mapper.Map<EmployeeViewModel>(employee);
+            var monthlyDataId = mappedEmployee.MonthlyEmployeeDataId;
+            var discounts = _context.Discounts
+                .Where(d => d.MonthlyEmployeeDataId == monthlyDataId)
+                .ToList();
+            var mappedDiscounts = _mapper.Map<List<DiscountViewModel>>(discounts);
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            return View(mappedDiscounts);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllBonus(int employeeId)
+        {
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+
+            var currentMonth = egyptDate.Month;
+            var currentYear = egyptDate.Year;
+
+            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId, currentMonth, currentYear));
+            var mappedEmployee = _mapper.Map<EmployeeViewModel>(employee);
+            var monthlyDataId = mappedEmployee.MonthlyEmployeeDataId;
+            var bonus = _context.Bounss
+                .Where(d => d.MonthlyEmployeeDataId == monthlyDataId)
+                .ToList();
+            var mappedBonus = _mapper.Map<List<BounsViewModel>>(bonus);
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            return View(mappedBonus);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllBorrows(int employeeId)
+        {
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+
+            var currentMonth = egyptDate.Month;
+            var currentYear = egyptDate.Year;
+
+            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId, currentMonth, currentYear));
+            var mappedEmployee = _mapper.Map<EmployeeViewModel>(employee);
+            var monthlyDataId = mappedEmployee.MonthlyEmployeeDataId;
+            var borrows = _context.Borrows
+                .Where(d => d.MonthlyEmployeeDataId == monthlyDataId)
+                .ToList();
+            var mappedBorrows = _mapper.Map<List<BorrowViewModel>>(borrows);
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            return View(mappedBorrows);
+        }
+        [HttpGet]
+        public IActionResult GetAllRequestsForFogetCloseShift(int employeeId, string? message)
+        {
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            ViewBag.Message = message;
+            var employee = _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
+            var UserId = employee.Result.UserId;
+            TempData["UserId"] = UserId;
+            TempData.Keep("UserId");
+            var requests = _context.requests.Where(r => r.EmployeeId == employeeId).ToList();
+
+            var MappedRequests = _mapper.Map<List<RequestForForgetCloseShiftViewModel>>(requests);
+            return View(MappedRequests);
+        }
+        [HttpGet]
+        public IActionResult RequestForForgetCloseShift(int employeeId)
+        {
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> RequestForForgetCloseShift(RequestForForgetCloseShiftViewModel model) 
+        {
+            if (!ModelState.IsValid)
+            {
+                int employeeId = (int)TempData["EmployeeId"]!;
+                var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
+                var existingRequest = _context.requests
+                    .FirstOrDefault(r => r.EmployeeId == employeeId && r.RequestDate.Date == model.RequestDate.Date);
+                if (existingRequest != null)
+                {
+                    return RedirectToAction("GetAllRequestsForFogetCloseShift", new { employeeId = employeeId, message = "يوجد طلب مقدم بنفس التاريخ" });
+                }
+                var request = new RequestForForgetCloseShift()
+                {
+                    EmployeeId = employeeId,
+                    RequestDate = model.RequestDate,
+                    Reason = model.Reason,
+                    Status = "Pending",
+                };
+                await _context.requests.AddAsync(request);
+                await _context.SaveChangesAsync();
+                TempData["EmployeeId"] = employeeId;
+                TempData.Keep("EmployeeId");
+                return RedirectToAction("GetAllRequestsForFogetCloseShift", new { employeeId = employeeId, message = "تم تقديم الطلب بنجاح" });
+            }
+            TempData.Keep("EmployeeId");
+            return View(model);
+        }
+        [HttpGet]
+        public IActionResult GetAllRequestBorrows(int employeeId, string? message = null)
+        {
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            ViewBag.Message = message;
+            var employee = _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
+            var UserId = employee.Result.UserId;
+            TempData["UserId"] = UserId;
+            TempData.Keep("UserId");
+            var requests = _context.requestBorrows.Where(r => r.EmployeeId == employeeId).ToList();
+            var MappedRequests = _mapper.Map<List<RequestBorrowViewModel>>(requests);
+            return View(MappedRequests);
+        }
+        [HttpGet]
+        public IActionResult RequestBorrow(int employeeId)
+        {
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> RequestBorrow(RequestBorrowViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                int employeeId = (int)TempData["EmployeeId"]!;
+                var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
+                var existingRequest = _context.requestBorrows
+                    .FirstOrDefault(r => r.EmployeeId == employeeId && r.RequestDate.Date == model.RequestDate.Date);
+                if (existingRequest != null)
+                {
+                    return RedirectToAction("GetAllRequestBorrows", new { employeeId = employeeId, message = "يوجد طلب مقدم بنفس التاريخ" });
+                }
+                var request = new RequestBorrow()
+                {
+                    EmployeeId = employeeId,
+                    RequestDate = model.RequestDate,
+                    Reason = model.Reason,
+                    Status = "Pending",
+                    Amount = model.Amount,
+                    
+                };
+                await _context.requestBorrows.AddAsync(request);
+                await _context.SaveChangesAsync();
+                TempData["EmployeeId"] = employeeId;
+                TempData.Keep("EmployeeId");
+                return RedirectToAction("GetAllRequestBorrows", new { employeeId = employeeId, message = "تم تقديم الطلب بنجاح" });
             }
             TempData.Keep("EmployeeId");
             return View(model);

@@ -100,7 +100,7 @@ namespace HRManagement.Controllers
                 BankName = model.BankName,
                 BankAccount = model.BankAccount,
                 UserId = user.Id,
-                
+               
 
             };
 
@@ -129,6 +129,7 @@ namespace HRManagement.Controllers
                     Month = currentMonth,
                     Year = currentYear,
                     Holidaies = 7,
+                    Target = (model.Target) * 26,
                 };
                 await _context.MonthlyEmployeeData.AddAsync(monthlyData);
             }
@@ -142,6 +143,7 @@ namespace HRManagement.Controllers
                     Year = currentYear,
                     Holidaies = 7,
                     TotalSalary = (model.SalaryPerHour * model.Hours??0) / 26,
+                    Target = (model.Target) * 26,
                 };
                 _context.MonthlyEmployeeData.Add(monthlyData);
             }
@@ -151,7 +153,7 @@ namespace HRManagement.Controllers
             return RedirectToAction("Index", new { message = "تم اضافه الموظف بنجاح" });
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllEmployees(int? month = null, int? year = null, string? BranchName = null,string? message = null)
+        public async Task<IActionResult> GetAllEmployees(int? month = null, int? year = null, string? BranchName = null,string? message = null , string? BankName = null , string? Name = null, string? Role = null)
         {
             var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
             var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
@@ -164,29 +166,35 @@ namespace HRManagement.Controllers
             ViewBag.CurrentMonth = currentMonth;
             ViewBag.CurrentYear = currentYear;
 
-            var employees = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec(currentMonth, currentYear, BranchName));
+            var employees = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec(currentMonth, currentYear, BranchName,BankName,Role,Name));
             var MappedEmployess = _mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeViewModel>>(employees);
 
             foreach (var employee in MappedEmployess)
             {
-                var totalDiscounts = _context.Discounts.Where(d => d.MonthlyEmployeeDataId == employee.MonthlyEmployeeDataId).Sum(b => b.Amount);
-                var totalBounss = _context.Bounss.Where(d => d.MonthlyEmployeeDataId == employee.MonthlyEmployeeDataId).Sum(b => b.Amount);
-                var totalBorrows = _context.Borrows.Where(d => d.MonthlyEmployeeDataId == employee.MonthlyEmployeeDataId).Sum(b => b.Amount);
-                
+                var totalDiscounts = _context.Discounts.Where(d => d.MonthlyEmployeeDataId == employee.MonthlyEmployeeDataId)
+                                                       .Where(s => s.year == currentYear && s.month == currentMonth).Sum(b => b.Amount);
+                var totalBounss = _context.Bounss.Where(d => d.MonthlyEmployeeDataId == employee.MonthlyEmployeeDataId)
+                                                 .Where(s => s.year == currentYear && s.month == currentMonth).Sum(b => b.Amount);
+                var totalBorrows = _context.Borrows.Where(d => d.MonthlyEmployeeDataId == employee.MonthlyEmployeeDataId)
+                                                   .Where(s => s.year == currentYear && s.Month == currentMonth).Sum(b => b.Amount);
+                employee.TotalDiscounts = totalDiscounts;
+                employee.TotalBonuss = totalBounss;
+                employee.TotalBorrows = totalBorrows;
                 if (employee?.Role.ToLower() == "static")
                 {
                     employee.NetSalary = (employee.TotalSalary + totalBounss)
                     - (totalBorrows + (double)totalDiscounts );
+
                 }
                 else if (employee?.Role.ToLower() == "changable")
                 {
-                    employee.NetSalary = ((((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0)) * employee.SalaryPerHour / 26)
+                    employee.NetSalary = ((((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0)+ (employee.ForgetedHours??0)) * employee.SalaryPerHour / 26)
                     + totalBounss) - (totalBorrows + (double)totalDiscounts);
                     employee.TotalSalary = (((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0) + (employee.ForgetedHours ?? 0)) * employee.SalaryPerHour) / 26;
                 }
                 else if (employee?.Role.ToLower() == "delivery")
                 {
-                    employee.NetSalary = ((((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0)) * employee.SalaryPerHour)
+                    employee.NetSalary = ((((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0) + (employee.ForgetedHours??0)) * employee.SalaryPerHour)
                     + totalBounss) - (totalBorrows + (double)totalDiscounts);
                     employee.TotalSalary = ((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0) + (employee.ForgetedHours??0))  * employee.SalaryPerHour;
 
@@ -194,6 +202,10 @@ namespace HRManagement.Controllers
                 if (employee.Holidaies == null)
                 {
                     employee.Holidaies = 7;
+                }
+                if (employee.Target == null || employee.Target == 0)
+                {
+                    employee.Target = 8*26;
                 }
 
                 var monthlyData = await _context.MonthlyEmployeeData
@@ -204,12 +216,16 @@ namespace HRManagement.Controllers
                     monthlyData.NetSalary = employee.NetSalary;
                     monthlyData.TotalSalary = employee.TotalSalary;
                     monthlyData.Holidaies = employee.Holidaies;
+                    monthlyData.Target = employee.Target;
+                    monthlyData.TotalDiscounts = employee.TotalDiscounts;
+                    monthlyData.TotalBorrows = employee.TotalBorrows;
+                    monthlyData.TotalBouns = employee.TotalBonuss;
                     _context.MonthlyEmployeeData.Update(monthlyData);
                 }
             }
 
             await _context.SaveChangesAsync();
-            var employees2 = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec(currentMonth, currentYear, BranchName));
+            var employees2 = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec(currentMonth, currentYear, BranchName, BankName, Role, Name));
             var MappedEmployess2 = _mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeViewModel>>(employees2);
             
             var uniqueBranchNames = employees2
@@ -218,8 +234,17 @@ namespace HRManagement.Controllers
                 .Distinct()
                 .ToList();
 
+            var uniqBankName = employees2.Where(e => !string.IsNullOrEmpty(e.BankName))
+                .Select(e => e.BankName)
+                .Distinct()
+                .ToList();
+            var uniqRole = employees2.Where(e => !string.IsNullOrEmpty(e.Role))
+                .Select(e => e.Role)
+                .Distinct()
+                .ToList();
             ViewData["BranchNames"] = uniqueBranchNames;
-
+            ViewData["BankNames"] = uniqBankName;
+            ViewData["Roles"] = uniqRole;
             ViewBag.Message = message;
             return View(MappedEmployess2);
         }
@@ -254,6 +279,7 @@ namespace HRManagement.Controllers
             {
                 monthlyData.Hours = model.Hours;
                 monthlyData.HoursOverTime = model.HoursOverTime;
+                monthlyData.ForgetedHours = model.ForgetedHours;
                 monthlyData.SalaryPerHour = model.SalaryPerHour;
                 monthlyData.TotalSalary = model.TotalSalary;
                 monthlyData.Holidaies = model.Holidaies;
@@ -272,19 +298,10 @@ namespace HRManagement.Controllers
                     .Where(md => md.Id == monthlyData.Id)
                     .SelectMany(md => md.Bounss)
                     .Sum(b => b.Amount);
-
-                if (model.Role.ToLower() == "static")
-                {
-                    monthlyData.NetSalary = (model.TotalSalary + totalBounss) - (totalBorrows + (double)totalDiscounts);
-                }
-                else if (model.Role.ToLower() == "changable")
-                {
-                    monthlyData.NetSalary = ((model.Hours ?? 0 + model.HoursOverTime ?? 0) * model.SalaryPerHour / 26) - (totalBorrows + (double)totalDiscounts);
-                }
-                else if (model.Role.ToLower() == "delivery")
-                {
-                    monthlyData.NetSalary = ((model.Hours ?? 0 + model.HoursOverTime ?? 0) * model.SalaryPerHour) - (totalBorrows + (double)totalDiscounts);
-                }
+                monthlyData.TotalDiscounts = totalDiscounts;
+                monthlyData.TotalBorrows = totalBorrows;
+                monthlyData.TotalBouns = totalBounss;
+                monthlyData.Target = model.Target;
             }
             else
             {
@@ -341,7 +358,7 @@ namespace HRManagement.Controllers
 
             return View(MappedRequest);
         }
-        [HttpPost] 
+        [HttpPost]
         public async Task<IActionResult> ApproveRequest(HolidayRequestViewModel model)
         {
             if (!ModelState.IsValid)
@@ -528,13 +545,24 @@ namespace HRManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> AddDiscount(DiscountViewModel model)
         {
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var monthlyData = await _context.MonthlyEmployeeData
+                .FirstOrDefaultAsync(m => m.Id == model.MonthlyEmployeeDataId);
+            if (monthlyData == null)
+            {
+                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
+            }
             var discount = new Discounts
             {
                 Amount = model.Amount,
                 ReasonOfDiscount = model.ReasonOfDiscount,
                 Notes = model.Notes??"",
-                Date = DateTime.UtcNow,
-                MonthlyEmployeeDataId = model.MonthlyEmployeeDataId
+                Date = egyptDateTime,
+                MonthlyEmployeeDataId = model.MonthlyEmployeeDataId,
+                month = monthlyData.Month,
+                year = monthlyData.Year,
             };
 
             await _context.Discounts.AddAsync(discount);
@@ -552,13 +580,25 @@ namespace HRManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> AddBouns(BounsViewModel model)
         {
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+
+            var monthlyData = await _context.MonthlyEmployeeData
+                .FirstOrDefaultAsync(m => m.Id == model.MonthlyEmployeeDataId);
+            if (monthlyData == null)
+            {
+                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
+            }
+            
             var bouns = new Bouns
             {
                 Amount = model.Amount,
                 Notes = model.Notes ?? "",
                 MonthlyEmployeeDataId = model.MonthlyEmployeeDataId,
-                DateOfBouns = DateTime.UtcNow,
+                DateOfBouns = egyptDateTime,
                 Reason = model.Reason,
+                month = monthlyData.Month,
+                year = monthlyData.Year,
             };
 
             await _context.Bounss.AddAsync(bouns);
@@ -576,13 +616,23 @@ namespace HRManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> AddBorrow(BorrowViewModel model)
         {
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+            var monthlyData = await _context.MonthlyEmployeeData
+                        .FirstOrDefaultAsync(m => m.Id == model.MonthlyEmployeeDataId);
+            if (monthlyData == null)
+            {
+                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
+            }
             var borrow = new Borrow
             {
                 Amount = model.Amount,
                 Notes = model.Notes ?? "",
                 MonthlyEmployeeDataId = model.MonthlyEmployeeDataId,
-                DateOfBorrow = DateTime.UtcNow,
+                DateOfBorrow = egyptDateTime,
                 Reason = model.Reason,
+                Month = monthlyData.Month,
+                year = monthlyData.Year,
             };
 
             await _context.Borrows.AddAsync(borrow);
@@ -738,5 +788,194 @@ namespace HRManagement.Controllers
             TempData.Keep("Date");
             return View(Result);
         }
+
+        //Forgeted Shifts
+        [HttpGet]
+        public async Task<IActionResult> GetAllForgetedShiftsRequests(string? message)
+        {
+            var requests = await _context.requests.Where(r => r.Status == "Pending").Include(s => s.employee).ToListAsync();
+            ViewBag.Message = message;
+
+            var mappedRequests = _mapper.Map<IEnumerable<RequestForForgetCloseShiftViewModel>>(requests);
+            return View(mappedRequests);
+        }
+        [HttpGet]
+        public async Task<IActionResult> ApproveForgetShift(int id)
+        {
+            var request = await _context.requests.FindAsync(id);
+            if (request == null)
+            {
+                return RedirectToAction("GetAllForgetedShiftsRequests", new { message = "الطلب غير موجود" });
+            }
+
+            var mappedRequest = _mapper.Map<RequestForForgetCloseShiftViewModel>(request);
+            return View(mappedRequest);
+        }
+        [HttpPost]
+        public async Task<IActionResult> ApproveForgetShift(RequestForForgetCloseShiftViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var request = await _context.requests.FindAsync(model.Id);
+                if (request == null)
+                {
+                    return RedirectToAction("GetAllForgetedShiftsRequests", new { message = "الطلب غير موجود" });
+                }
+
+                request.Status = "مقبول";
+                _context.requests.Update(request);
+
+                int result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    return RedirectToAction("GetAllForgetedShiftsRequests", new { message = "تم قبول الطلب" });
+                }
+            }
+            return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> RejectForgetShift(int id)
+        {
+            var request = await _context.requests.FindAsync(id);
+            if (request == null)
+            {
+                return RedirectToAction("GetAllForgetedShiftsRequests", new { message = "الطلب غير موجود" });
+            }
+
+            var mappedRequest = _mapper.Map<RequestForForgetCloseShiftViewModel>(request);
+            return View(mappedRequest);
+        }
+        [HttpPost]
+        public async Task<IActionResult> RejectForgetShift(RequestForForgetCloseShiftViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var request = await _context.requests.FindAsync(model.Id);
+                if (request == null)
+                {
+                    return RedirectToAction("GetAllForgetedShiftsRequests", new { message = "الطلب غير موجود" });
+                }
+
+                request.Status = "مرفوض";
+                request.ReasonOfRejection = model.ReasonOfRejection;
+                _context.requests.Update(request);
+
+                int result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    return RedirectToAction("GetAllForgetedShiftsRequests", new { message = "تم رفض الطلب" });
+                }
+            }
+            return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> RequestForgtedCloseShiftsArchive() 
+        {
+            var requests = await _context.requests.Where(r => r.Status == "مقبول" || r.Status == "مرفوض").ToListAsync();
+
+            var mappedRequests = _mapper.Map<IEnumerable<RequestForForgetCloseShiftViewModel>>(requests);
+            return View(mappedRequests);
+        }
+        //Request for Borrow
+        [HttpGet]
+        public async Task<IActionResult> GetAllRequestBorrow(string? message)
+        {
+            var requests = await _context.requestBorrows.Where(r => r.Status == "Pending")
+                .Include(r => r.Employee)
+                .ToListAsync();
+
+            var mappedRequests = _mapper.Map<IEnumerable<RequestBorrowViewModel>>(requests);
+            ViewBag.Message = message;
+            return View(mappedRequests);
+        }
+        [HttpGet]
+        public async Task<IActionResult> ApproveRequestBorrow(int id)
+        {
+            var request = await _context.requestBorrows
+                .Include(r => r.Employee)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (request == null)
+            {
+                return RedirectToAction("GetAllRequestBorrow", new { message = "الطلب غير موجود" });
+            }
+
+            var mappedRequest = _mapper.Map<RequestBorrowViewModel>(request);
+            return View(mappedRequest);
+        }
+        [HttpPost]
+        public async Task<IActionResult> ApproveRequestBorrow(RequestBorrowViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var request = await _context.requestBorrows.FindAsync(model.Id);
+                if (request == null)
+                {
+                    return RedirectToAction("GetAllRequestBorrow", new { message = "الطلب غير موجود" });
+                }
+
+                request.Status = "مقبول";
+                request.notes = model.notes;
+                _context.requestBorrows.Update(request);
+
+                int result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    return RedirectToAction("GetAllRequestBorrow", new { message = "تم قبول الطلب" });
+                }
+            }
+            return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> RejectRequestBorrow(int id)
+        {
+            var request = await _context.requestBorrows
+                .Include(r => r.Employee)
+                .FirstOrDefaultAsync(r => r.Id == id);
+
+            if (request == null)
+            {
+                return RedirectToAction("GetAllRequestBorrow", new { message = "الطلب غير موجود" });
+            }
+
+            var mappedRequest = _mapper.Map<RequestBorrowViewModel>(request);
+            return View(mappedRequest);
+        }
+        [HttpPost]
+        public async Task<IActionResult> RejectRequestBorrow(RequestBorrowViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var request = await _context.requestBorrows.FindAsync(model.Id);
+                if (request == null)
+                {
+                    return RedirectToAction("GetAllRequestBorrow", new { message = "الطلب غير موجود" });
+                }
+
+                request.Status = "مرفوض";
+                request.ReasonOfRejection = model.ReasonOfRejection;
+                request.notes = model.notes;
+                _context.requestBorrows.Update(request);
+
+                int result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    return RedirectToAction("GetAllRequestBorrow", new { message = "تم رفض الطلب" });
+                }
+            }
+            return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> RequestBorrowArchive()
+        {
+            var requests = await _context.requestBorrows
+                .Where(r => r.Status == "مقبول" || r.Status == "مرفوض")
+                .Include(r => r.Employee)
+                .ToListAsync();
+
+            var mappedRequests = _mapper.Map<IEnumerable<RequestBorrowViewModel>>(requests);
+            return View(mappedRequests);
+        }
+
     }
 }

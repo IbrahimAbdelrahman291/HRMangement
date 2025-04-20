@@ -325,13 +325,13 @@ namespace HRManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllUsers(string? userName = null,string? message = null)
         {
-            var users = await _userManager.Users.ToListAsync();
-            if(userName != null) 
+            var employees = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec());
+            var employeesWithUserName = employees.Select(e => new ResetPassWordViewModel
             {
-                users = users.Where(u => u.UserName.Contains(userName)).ToList();
-            }
-            ViewBag.Message = message;
-            return View(users);
+                Name = e.Name,
+                UserName = _userManager.Users.FirstOrDefault(u => u.Id == e.UserId)?.UserName
+            }).ToList();
+            return View(employeesWithUserName);
         }
 
         [HttpGet]

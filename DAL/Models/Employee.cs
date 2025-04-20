@@ -26,5 +26,6 @@ namespace DAL.Models
         public ICollection<MonthlyEmployeeData> MonthlyData { get; set; } = new List<MonthlyEmployeeData>();
         public ICollection<HolidayRequests> HolidayRequests { get; set; } = new List<HolidayRequests>();
         public ICollection<ResignationRequests> ResignationRequests { get; set; } = new List<ResignationRequests>();
+        public ICollection<RequestForForgetCloseShift> requests { get; set; } = new List<RequestForForgetCloseShift>();
     }
 }

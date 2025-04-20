@@ -67,6 +67,7 @@
             justify-content: center;
             gap: 20px;
             margin-top: 30px;
+            flex-wrap: wrap;
         }
 
         .card {
@@ -191,6 +192,16 @@
             <h2>تقرير الحضور والانصراف</h2>
             <p>عرض جميع عمليات الحضور والانصراف المكتمله والمنسيه</p>
             <a asp-action="GetAttendanceReport">عرض التقرير</a>
+        </div>
+        <div class="card">
+            <h2>طلبات نسيان الشيفت</h2>
+            <p>عرض جميع الطلبات</p>
+            <a asp-action="GetAllForgetedShiftsRequests">عرض الطلبات</a>
+        </div>
+        <div class="card">
+            <h2>طلبات السلف</h2>
+            <p>عرض جميع الطلبات</p>
+            <a asp-action="GetAllRequestBorrow">عرض الطلبات</a>
         </div>
     </div>
     <footer style="margin-top: 50px; text-align: center; padding: 15px; background-color: #f4f4f4; color: #555; font-size: 14px;">

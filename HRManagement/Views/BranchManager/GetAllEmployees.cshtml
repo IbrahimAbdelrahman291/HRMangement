@@ -105,10 +105,14 @@
                     <th>الشهر</th>
                     <th>السنة</th>
                     <th>عدد الساعات</th>
+                    <th>التارجيت</th>
                     <th>عدد ساعات العمل الإضافي</th>
                     <th>عدد الساعات المنسيه</th>
                     <th>الراتب بالساعة</th>
                     <th>إجمالي الراتب</th>
+                    <th>الزيادات</th>
+                    <th>السلف</th>
+                    <th>الخصومات</th>
                     <th>صافي المرتب</th>
                 </tr>
             </thead>
@@ -125,10 +129,14 @@
                         <td>@employee.Month</td>
                         <td>@employee.Year</td>
                         <td>@employee.Hours</td>
+                        <td>@employee.Target</td>
                         <td>@employee.HoursOverTime</td>
                         <td>@employee.ForgetedHours</td>
                         <td>@employee.SalaryPerHour</td>
                         <td>@Math.Round((double)employee.TotalSalary, 2).ToString("F2")</td>
+                        <td>@employee.TotalBonuss</td>
+                        <td>@employee.TotalBorrows</td>
+                        <td>@employee.TotalDiscounts</td>
                         <td>@Math.Round((double)employee.NetSalary, 2).ToString("F2")</td>
                     </tr>
                 }
