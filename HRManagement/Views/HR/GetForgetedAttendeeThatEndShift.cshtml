@@ -3,10 +3,11 @@
     ViewData["Title"] = "GetForgetedAttendeeThatEndShift";
     var Date = TempData["Date"] is DateTime dt ? dt : (DateTime?)null;
 }
-
 <html lang="ar">
 <head>
     <meta charset="utf-8" />
+    <title>تقرير الشيفتات المنسية</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -23,6 +24,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
+            justify-content: center;
         }
 
         .small-btn {
@@ -39,6 +41,22 @@
 
             .small-btn:hover {
                 background-color: #0056b3;
+            }
+
+        .export-button {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+
+            .export-button:hover {
+                background-color: #059669;
             }
 
         .form-inline-date {
@@ -88,20 +106,23 @@
             background-color: #f2f2f2;
         }
     </style>
+    <script>
+        function exportTableToExcel() {
+            var wb = XLSX.utils.table_to_book(document.querySelector("table"), { sheet: "ForgottenShiftsReport" });
+            XLSX.writeFile(wb, "ForgottenShiftsReport.xlsx");
+        }
+    </script>
 </head>
 <body>
-
-    <h2>تقرير الحضور</h2>
+    <h2>تقرير الشيفتات المنسية</h2>
 
     <div class="action-buttons">
-        
+        <button class="export-button" onclick="exportTableToExcel()">تصدير إلى Excel</button>
         <form asp-action="GetAttendanceReport" method="get">
             <input type="hidden" name="date" value="@Date" />
             <button type="submit" class="small-btn">رجوع</button>
         </form>
     </div>
-
-    
 
     <table>
         <thead>
@@ -135,6 +156,5 @@
             }
         </tbody>
     </table>
-
 </body>
 </html>

@@ -331,6 +331,10 @@ namespace HRManagement.Controllers
                 Name = e.Name,
                 UserName = _userManager.Users.FirstOrDefault(u => u.Id == e.UserId)?.UserName
             }).ToList();
+            if (!string.IsNullOrWhiteSpace(userName))
+            {
+                employeesWithUserName = employeesWithUserName.Where(e => e.UserName != null && e.UserName.Contains(userName)).ToList();
+            }
             return View(employeesWithUserName);
         }
 

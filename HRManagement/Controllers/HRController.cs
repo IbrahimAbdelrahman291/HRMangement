@@ -871,7 +871,7 @@ namespace HRManagement.Controllers
         [HttpGet]
         public async Task<IActionResult> RequestForgtedCloseShiftsArchive() 
         {
-            var requests = await _context.requests.Where(r => r.Status == "مقبول" || r.Status == "مرفوض").ToListAsync();
+            var requests = await _context.requests.Where(r => r.Status == "مقبول" || r.Status == "مرفوض").Include(e => e.employee).ToListAsync();
 
             var mappedRequests = _mapper.Map<IEnumerable<RequestForForgetCloseShiftViewModel>>(requests);
             return View(mappedRequests);

@@ -491,12 +491,7 @@ namespace HRManagement.Controllers
             {
                 int employeeId = (int)TempData["EmployeeId"]!;
                 var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
-                var existingRequest = _context.requestBorrows
-                    .FirstOrDefault(r => r.EmployeeId == employeeId && r.RequestDate.Date == model.RequestDate.Date);
-                if (existingRequest != null)
-                {
-                    return RedirectToAction("GetAllRequestBorrows", new { employeeId = employeeId, message = "يوجد طلب مقدم بنفس التاريخ" });
-                }
+                
                 var request = new RequestBorrow()
                 {
                     EmployeeId = employeeId,

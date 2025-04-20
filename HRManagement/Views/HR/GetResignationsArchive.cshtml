@@ -3,104 +3,126 @@
     ViewData["Title"] = "GetResignationsArchive";
 }
 
-
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-<meta charset="UTF-8">
-<title>ارشيف الاستقالات</title>
-<style>
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background-color: #f4f4f4;
-        padding: 0;
-        margin: 0;
-    }
+    <meta charset="UTF-8">
+    <title>ارشيف الاستقالات</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            padding: 0;
+            margin: 0;
+        }
 
-    h2 {
-        text-align: center;
-        margin-top: 30px;
-        color: #2c3e50;
-    }
+        h2 {
+            text-align: center;
+            margin-top: 30px;
+            color: #2c3e50;
+        }
 
-    .top-btn-container {
-        text-align: end;
-        margin: 20px 40px 0 0;
-    }
+        .top-btn-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 40px 0 40px;
+        }
 
-        .top-btn-container a {
-            background-color: #8e44ad;
+            .top-btn-container a {
+                background-color: #8e44ad;
+                color: white;
+                padding: 10px 18px;
+                text-decoration: none;
+                border-radius: 8px;
+                font-size: 1rem;
+            }
+
+        .export-button {
+            background-color: #10b981;
             color: white;
             padding: 10px 18px;
-            text-decoration: none;
             border-radius: 8px;
+            border: none;
+            cursor: pointer;
             font-size: 1rem;
+            transition: background-color 0.3s;
         }
 
-    .resignation-table {
-        width: 95%;
-        margin: 20px auto;
-        border-collapse: collapse;
-        background-color: white;
-        box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
-    }
+            .export-button:hover {
+                background-color: #059669;
+            }
 
-        .resignation-table th,
-        .resignation-table td {
-            padding: 12px;
-            border: 1px solid #ddd;
-            text-align: center;
+        .resignation-table {
+            width: 95%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
         }
 
-        .resignation-table th {
-            background-color: #2c3e50;
+            .resignation-table th,
+            .resignation-table td {
+                padding: 12px;
+                border: 1px solid #ddd;
+                text-align: center;
+            }
+
+            .resignation-table th {
+                background-color: #2c3e50;
+                color: white;
+            }
+
+            .resignation-table tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .accept-btn {
+            background-color: #27ae60;
             color: white;
         }
 
-        .resignation-table tr:nth-child(even) {
-            background-color: #f2f2f2;
+        .reject-btn {
+            background-color: #c0392b;
+            color: white;
         }
 
-    .action-btn {
-        padding: 6px 12px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        text-decoration: none;
-        font-weight: bold;
-    }
-
-    .accept-btn {
-        background-color: #27ae60;
-        color: white;
-    }
-
-    .reject-btn {
-        background-color: #c0392b;
-        color: white;
-    }
-
-    .message-box {
-        margin-bottom: 15px;
-        padding: 10px;
-        background-color: #34d399;
-        color: white;
-        text-align: center;
-        border-radius: 5px;
-        transition: opacity 0.5s;
-    }
-</style>
-<script>
-    window.onload = function () {
-        const messageBox = document.getElementById("message-box");
-        if (messageBox) {
-            setTimeout(() => {
-                messageBox.style.opacity = "0";
-                setTimeout(() => messageBox.remove(), 500);
-            }, 5000);
+        .message-box {
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #34d399;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            transition: opacity 0.5s;
         }
-    }
-</script>
+    </style>
+    <script>
+        function exportTableToExcel() {
+            var wb = XLSX.utils.table_to_book(document.querySelector(".resignation-table"), { sheet: "ResignationArchive" });
+            XLSX.writeFile(wb, "ResignationArchive.xlsx");
+        }
+
+        window.onload = function () {
+            const messageBox = document.getElementById("message-box");
+            if (messageBox) {
+                setTimeout(() => {
+                    messageBox.style.opacity = "0";
+                    setTimeout(() => messageBox.remove(), 500);
+                }, 5000);
+            }
+        }
+    </script>
 </head>
 <body>
     @if (ViewBag.Message != null)
@@ -112,6 +134,7 @@
     <h2>ارشيف الاستقالات</h2>
 
     <div class="top-btn-container">
+        <button class="export-button" onclick="exportTableToExcel()">تصدير إلى Excel</button>
         <a asp-action="GetAllPendResignations" method="get">رجوع</a>
     </div>
 
@@ -126,21 +149,17 @@
             </tr>
         </thead>
         <tbody>
-            @{
-
-                foreach (var item in Model)
-                {
-                    <tr>
-                        <td>@item.EmployeeName</td>
-                        <td>@item.ResignationDate</td>
-                        <td>@item.Status</td>
-                        <td>@item.ReasonOfResignation</td>
-                        <td>@item.ReasonOfRejection</td>
-                    </tr>
-                }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.EmployeeName</td>
+                    <td>@item.ResignationDate</td>
+                    <td>@item.Status</td>
+                    <td>@item.ReasonOfResignation</td>
+                    <td>@item.ReasonOfRejection</td>
+                </tr>
             }
         </tbody>
     </table>
-
 </body>
 </html>
