@@ -62,5 +62,6 @@ namespace DAL.Context
         public DbSet<User> Users { get; set; }
         public DbSet<RequestForForgetCloseShift> requests { get; set; }
         public DbSet<RequestBorrow> requestBorrows { get; set; }
+        public DbSet<Complaints> Complaints { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿@{
+﻿@model LoginViewModel
+@{
     ViewData["Title"] = "Index";
     var message = ViewBag.Message;
 }
@@ -67,7 +68,7 @@
             justify-content: center;
             gap: 20px;
             margin-top: 30px;
-			flex-wrap: wrap;
+            flex-wrap: wrap;
         }
 
         .card {
@@ -100,6 +101,13 @@
                 .card a:hover {
                     background: #0056b3;
                 }
+
+        .logo {
+            width: 100px;
+            height: auto;
+            margin: 20px auto;
+            display: block;
+        }
     </style>
 
     <script>
@@ -127,12 +135,14 @@
         ViewBag.Message = null;
     }
 
+    <img src="/images/logoHR.png" alt="Logo" class="logo">
+    <h1>شيفتي</h1>
+
     <div class="info-box">
         <h3>تعليمات:</h3>
         <p>نرجو منكم التسجيل في موعد الدخول والانصراف المحدد لكم لعدم حدوث اي ضرر لكم مثل عدم احتساب ساعات العمل اذا نسيتم انهاء الشيفت.</p>
     </div>
 
-    <h1>شيفتي</h1>
     <div class="container">
         <div class="card">
             <h2>الشيفت</h2>
@@ -164,7 +174,18 @@
             <p>تقديم طلب سلفه</p>
             <a asp-action="GetAllRequestBorrows" asp-route-employeeId="@TempData["EmployeeId"]">تقديم</a>
         </div>
+        <div class="card">
+            <h2>الشكاوى</h2>
+            <p>تقديم شكوى للاداره (صوتك مسموع)</p>
+            <a asp-action="GetAllComplaints" asp-route-employeeId="@TempData["EmployeeId"]">تقديم</a>
+        </div>
+        <div class="card">
+            <h2>لائحه العمل</h2>
+            <p>لائحه العمل</p>
+            <a asp-action="ViewInstructions" asp-route-employeeId="@TempData["EmployeeId"]">عرض</a>
+        </div>
     </div>
+
     <footer style="margin-top: 50px; text-align: center; padding: 15px; background-color: #f4f4f4; color: #555; font-size: 14px;">
         © Copyright
         <a href="https://opshan.github.io/home" target="_blank" style="color: #007bff; text-decoration: none;">

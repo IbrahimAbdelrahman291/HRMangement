@@ -131,6 +131,8 @@ namespace HRManagement.Controllers
 
                 var egyptDate = DateOnly.FromDateTime(egyptDateTime);
                 var egyptTime = TimeOnly.FromDateTime(egyptDateTime);
+                var currentmonth = egyptDate.Month;
+                var currentyear = egyptDate.Year;
 
                 var workLog = await _context.WorkLogs
                     .FirstOrDefaultAsync(w => w.EmployeeId == employeeId
@@ -168,7 +170,7 @@ namespace HRManagement.Controllers
 
                 workLog.TotalTime = totalWorkTime;
 
-                var employeeData = await _context.MonthlyEmployeeData
+                var employeeData = await _context.MonthlyEmployeeData.Where(m => m.Month== currentmonth && m.Year == currentyear)
                                                  .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
                 if (employeeData != null)
                 {
@@ -202,8 +204,8 @@ namespace HRManagement.Controllers
             {
 
                 TempData.Keep("EmployeeId");
-                var month = DateTime.UtcNow.Month;
-                var year = DateTime.UtcNow.Year;
+                int? month = null;
+                int? year = null;
 
                 var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(EmpId, month, year));
                
@@ -510,5 +512,71 @@ namespace HRManagement.Controllers
             TempData.Keep("EmployeeId");
             return View(model);
         }
+        [HttpGet]
+        public IActionResult GetAllComplaints(int employeeId, string? message = null)
+        {
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            ViewBag.Message = message;
+            var employee = _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
+            var UserId = employee.Result.UserId;
+            TempData["UserId"] = UserId;
+            TempData.Keep("UserId");
+            var complaints = _context.Complaints
+                .Where(c => c.EmployeeId == employeeId)
+                .ToList();
+            var mappedComplaints = _mapper.Map<List<ComplaintsViewModle>>(complaints);
+            return View(mappedComplaints);
+        }
+        [HttpGet]
+        public IActionResult AddComplaint(int employeeId)
+        {
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddComplaint(ComplaintsViewModle modle) 
+        {
+            if (!ModelState.IsValid)
+            {
+                int employeeId = (int)TempData["EmployeeId"]!;
+                var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
+                var Complaints = new Complaints()
+                {
+                    EmployeeId = employeeId,
+                    Date = DateTime.UtcNow,
+                    content = modle.content,
+                    status = "Pending",
+                };
+                await _context.Complaints.AddAsync(Complaints);
+                int result = await _context.SaveChangesAsync();
+                TempData["EmployeeId"] = employeeId;
+                TempData.Keep("EmployeeId");
+                if (result > 0 )
+                {
+                    return RedirectToAction("GetAllComplaints", new { employeeId = employeeId, message = "تم تقديم الطلب بنجاح" });
+                }
+                else
+                {
+                    TempData["EmployeeId"] = employeeId;
+                    TempData.Keep("EmployeeId");
+                    return RedirectToAction("GetAllComplaints", new { employeeId = employeeId, message = "فشل تقديم الطلب" });
+                }
+            }
+            return View(modle);
+        }
+
+        public async Task<IActionResult> ViewInstructions(int employeeId)
+        {
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
+            var UserId = employee.UserId;
+            TempData["UserId"] = UserId;
+            TempData.Keep("UserId");
+            return View();
+        }
+
     }
 }

@@ -86,6 +86,9 @@ namespace HRManagement.Helper
 
             CreateMap<RequestBorrow, RequestBorrowViewModel>().ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name));
             CreateMap<RequestBorrowViewModel, RequestBorrow>().ForMember(dest => dest.Employee , opt => opt.Ignore());
+
+            CreateMap<Complaints, ComplaintsViewModle>().ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name));
+            CreateMap<ComplaintsViewModle, Complaints>().ForMember(dest => dest.Employee , opt => opt.Ignore());
         }
     }
 }

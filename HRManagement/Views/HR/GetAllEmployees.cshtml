@@ -4,6 +4,8 @@
     var branchNames = ViewData["BranchNames"] as List<string> ?? new List<string>();
     var bankNames = ViewData["BankNames"] as List<string> ?? new List<string>();
     var Roles = ViewData["Roles"] as List<string> ?? new List<string>();
+    TempData.Keep("FilterMonth");
+    TempData.Keep("FilterYear");
 }
 
 <html lang="ar">
@@ -180,18 +182,24 @@
                         <td>
                             <form asp-action="GetAllDiscounts" method="get">
                                 <input type="hidden" name="monthlyEmployeeDataId" value="@employee.MonthlyEmployeeDataId" />
+                                <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
+                                <input type="hidden" name="year" value="@TempData["FilterYear"]" />
                                 <button type="submit" class="btn">خصم</button>
                             </form>
                         </td>
                         <td>
                             <form asp-action="GetAllBorrows" method="get">
                                 <input type="hidden" name="monthlyEmployeeDataId" value="@employee.MonthlyEmployeeDataId" />
+                                <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
+                                <input type="hidden" name="year" value="@TempData["FilterYear"]" />
                                 <button type="submit" class="btn">سلفه</button>
                             </form>
                         </td>
                         <td>
                             <form asp-action="GetAllBouns" method="get">
                                 <input type="hidden" name="monthlyEmployeeDataId" value="@employee.MonthlyEmployeeDataId" />
+                                <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
+                                <input type="hidden" name="year" value="@TempData["FilterYear"]" />
                                 <button type="submit" class="btn">الزيادات</button>
                             </form>
                         </td>
@@ -208,11 +216,11 @@
                         <td>@employee.ForgetedHours</td>
                         <td>@employee.Holidaies</td>
                         <td>@employee.SalaryPerHour</td>
-                        <td>@Math.Round((double)employee.TotalSalary, 2).ToString("F2")</td>
+                        <td>@employee.TotalSalary</td>
                         <td>@employee.TotalBonuss</td>
                         <td>@employee.TotalBorrows</td>
                         <td>@employee.TotalDiscounts</td>
-                        <td>@Math.Round((double)employee.NetSalary, 2).ToString("F2")</td>
+                        <td>@employee.NetSalary</td>
                     </tr>
                 }
             </tbody>

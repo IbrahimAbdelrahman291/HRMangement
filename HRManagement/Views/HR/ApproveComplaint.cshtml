@@ -1,0 +1,129 @@
+﻿@model ComplaintsViewModle
+@{
+    ViewData["Title"] = "ApproveComplaint";
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>تفاصيل الشكوى</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f7f7;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .form-container {
+            width: 60%;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #f0f0f0;
+            color: #555;
+        }
+
+            input[readonly], textarea[readonly] {
+                background-color: #f0f0f0;
+                cursor: not-allowed;
+            }
+
+        .btn-submit {
+            margin-top: 20px;
+            background-color: #2ecc71;
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+            .btn-submit:hover {
+                background-color: #27ae60;
+            }
+
+        .back-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+            .back-btn:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</head>
+<body>
+
+    <h2>تفاصيل الشكوى</h2>
+
+    <form asp-action="ApproveComplaint" method="post" class="form-container">
+        <input type="hidden" name="Id" value="@Model.Id" />
+
+        <div class="form-group">
+            <label>اسم الموظف</label>
+            <input type="text" value="@Model.EmployeeName" readonly />
+        </div>
+
+        <div class="form-group">
+            <label>تاريخ الشكوى</label>
+            <input type="text" value="@Model.Date" readonly />
+        </div>
+
+        <div class="form-group">
+            <label>الحالة</label>
+            <input type="text" value="@Model.status" readonly />
+        </div>
+
+        <div class="form-group">
+            <label>محتوى الشكوى</label>
+            <textarea rows="3" readonly>@Model.content</textarea>
+        </div>
+
+        <label asp-for="response">الرد</label>
+        <input asp-for="response" type="text" rows="4" placeholder="ادخل ردك هنا..." required />
+
+
+
+        <button type="submit" class="btn-submit">قبول الطلب</button>
+    </form>
+    <a asp-action="GetAllComplaints" class="back-btn">رجوع</a>
+</body>
+</html>

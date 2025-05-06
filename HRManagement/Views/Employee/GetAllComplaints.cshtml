@@ -1,0 +1,149 @@
+﻿@model List<ComplaintsViewModle>
+@{
+    ViewData["Title"] = "GetAllComplaints";
+    var employeeId = TempData["EmployeeId"];
+    var UserId = TempData["UserId"];
+}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>الشكاوى</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 30px;
+            color: #2c3e50;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            width: 95%;
+            margin: 20px auto;
+        }
+
+        .resign-btn, .back-btn {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+            .resign-btn:hover, .back-btn:hover {
+                background-color: #2980b9;
+            }
+
+        .resignation-table {
+            width: 95%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+            .resignation-table th,
+            .resignation-table td {
+                border: 1px solid #ddd;
+                padding: 12px;
+                text-align: center;
+            }
+
+            .resignation-table th {
+                background-color: #2c3e50;
+                color: white;
+                font-size: 16px;
+            }
+
+            .resignation-table tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+
+            .resignation-table tr:hover {
+                background-color: #e8f4fd;
+            }
+
+        .message-box {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 10px auto;
+            width: fit-content;
+            transition: opacity 0.5s;
+            opacity: 1;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            const messageBox = document.getElementById("message-box");
+            if (messageBox) {
+                setTimeout(() => {
+                    messageBox.style.opacity = "0";
+                    setTimeout(() => messageBox.remove(), 500);
+                }, 5000);
+            }
+        }
+    </script>
+</head>
+<body>
+
+    <h2>شكاواتك</h2>
+
+    @if (ViewBag.Message != null)
+    {
+        <div id="message-box" class="message-box">
+            @ViewBag.Message
+        </div>
+        ViewBag.Message = null;
+    }
+
+    <div class="button-container">
+        <a asp-action="Index" asp-route-userId="@UserId" class="back-btn">رجوع</a>
+
+        <a asp-action="AddComplaint" asp-route-employeeId="@employeeId" class="resign-btn">تقديم شكوى</a>
+    </div>
+
+    <table class="resignation-table">
+        <thead>
+            <tr>
+                <th>رقم الشكوى التعريفي</th>
+                <th>اسم الموظف</th>
+                <th>تاريخ الشكوى</th>
+                <th>الحاله</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.EmployeeName</td>
+                        <td>@item.Date</td>
+                        <td>@item.status</td>
+
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</body>
+</html>
+
+
+

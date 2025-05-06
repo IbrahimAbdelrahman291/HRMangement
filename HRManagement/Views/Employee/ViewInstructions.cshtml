@@ -1,0 +1,80 @@
+﻿@{
+    ViewData["Title"] = "ViewInstructions";
+    TempData.Keep("EmployeeId");
+    var UserId = TempData["UserId"];
+}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .image-container {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+
+            .image-container img {
+                width: 100%;
+                height: auto;
+                display: block;
+                border: 1px solid #ccc;
+                box-sizing: border-box;
+            }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            z-index: 1000;
+        }
+
+            .back-btn:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</head>
+<body>
+    <a asp-action="Index" asp-route-userId="@UserId" class="back-btn">رجوع</a>
+
+    <h1>عرض صور التعليمات</h1>
+
+    <div class="image-container">
+        <img src="/images/ins1.png" alt="ins1">
+    </div>
+    <div class="image-container">
+        <img src="/images/ins2.png" alt="ins2" >
+    </div>
+    <div class="image-container">
+        <img src="/images/ins3.png" alt="ins3" >
+    </div>
+    <div class="image-container">
+        <img src="/images/ins4.png" alt="ins4">
+    </div>
+    <div class="image-container">
+        <img src="/images/ins5.png" alt="ins5">
+    </div>
+</body>
+</html>

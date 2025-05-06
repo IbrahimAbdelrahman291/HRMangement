@@ -1,7 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Index";
 }
-
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
@@ -96,6 +95,12 @@
                     background: #0056b3;
                 }
 
+        .logo {
+            width: 100px;
+            height: auto;
+            margin: 20px auto;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -109,6 +114,8 @@
         ViewBag.Message = null;
     }
 
+    <img src="/images/logoHR.png" alt="Logo" class="logo">
+
     <div class="instructions-box">
         <h3>تعليمات للمدير:</h3>
         <p>- عند ادخال يوزر جديد سواء كان مدير فروع او موارد بشريه او محاسبين يجب ادخال يزور وباسورد</p>
@@ -116,6 +123,8 @@
         <p>- يجب ان يكون اليوزر بالانجليزيه ولا يوجد اي فراغات</p>
         <p>- يمكنك اضافه موارد بشريه ومحاسبين ومدير فروع ويمكنك حذفهم ويمكنك حذف موظفين ايضا</p>
     </div>
+
+    <h1>لوحة التحكم</h1>
 
     <div class="container">
         <div class="card">
@@ -144,6 +153,7 @@
             <a asp-action="GetAllUsers">عرض المستخدمين</a>
         </div>
     </div>
+
     <footer style="margin-top: 50px; text-align: center; padding: 15px; background-color: #f4f4f4; color: #555; font-size: 14px;">
         © Copyright
         <a href="https://opshan.github.io/home" target="_blank" style="color: #007bff; text-decoration: none;">

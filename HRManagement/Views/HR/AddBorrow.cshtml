@@ -1,6 +1,8 @@
 ﻿@model BorrowViewModel
 @{
     ViewData["Title"] = "AddBorrow";
+    TempData.Keep("FilterMonth");
+    TempData.Keep("FilterYear");
 }
 
 <!DOCTYPE html>
@@ -75,6 +77,8 @@
         <h1>إضافة سُلفة</h1>
         <form asp-action="AddBorrow" method="post">
             <input type="hidden" name="MonthlyEmployeeDataId" value="@TempData["MonthlyEmployeeDataId"]" />
+            <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
+            <input type="hidden" name="year" value="@TempData["FilterYear"]" />
 
             <label asp-for="Amount">المبلغ</label>
             <input asp-for="Amount" type="number" required />
@@ -92,7 +96,7 @@
         </form>
 
         <div style="text-align: center;">
-            <a asp-action="GetAllBorrows" class="back-btn">رجوع</a>
+            <a asp-action="GetAllBorrows" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" class="back-btn">رجوع</a>
         </div>
     </div>
 </body>

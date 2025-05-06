@@ -1,6 +1,8 @@
 ﻿@model BounsViewModel
 @{
     ViewData["Title"] = "AddBouns";
+    TempData.Keep("FilterMonth");
+    TempData.Keep("FilterYear");
 }
 
 <!DOCTYPE html>
@@ -75,6 +77,8 @@
         <h1>إضافة مكافأة</h1>
         <form asp-action="AddBouns" method="post">
             <input asp-for="MonthlyEmployeeDataId" type="hidden" value="@TempData["MonthlyEmployeeDataId"]" />
+            <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
+            <input type="hidden" name="year" value="@TempData["FilterYear"]" />
 
             <label for="Amount">المبلغ</label>
             <input asp-for="Amount" type="number" placeholder="المبلغ" required />
@@ -91,7 +95,7 @@
             <button type="submit">إضافة</button>
         </form>
         <div style="text-align: center;">
-            <a asp-action="GetAllBouns" class="back-btn">رجوع</a>
+            <a asp-action="GetAllBouns" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" class="back-btn">رجوع</a>
         </div>
     </div>
 </body>

@@ -24,7 +24,7 @@ namespace BLL.Specification
 
             AddFilter(e => e.MonthlyData.Any(m => m.Month == currentMonth && m.Year == currentYear));
 
-            AddInclude(e => e.MonthlyData);
+            AddInclude(e => e.MonthlyData.Where(m => m.Month == currentMonth && m.Year == currentYear));
         }
 
         public EmployeeSpec(int? month = null, int? year = null, string? branchName = null)
@@ -47,7 +47,7 @@ namespace BLL.Specification
                 AddFilter(e => e.BranchName.Contains(branchName));
             }
 
-            AddInclude(e => e.MonthlyData);
+            AddInclude(e => e.MonthlyData.Where(m => m.Month == currentMonth && m.Year == currentYear));
         }
         public EmployeeSpec(int? month = null , int? year = null, string? branchName = null , string? bankName = null , string? Role = null, string? name = null) 
         {
@@ -59,10 +59,7 @@ namespace BLL.Specification
             var currentMonth = month ?? egyptDate.Month;
             var currentYear = year ?? egyptDate.Year;
 
-            Criteria = e => e.MonthlyData.Any(m =>
-                (month == null || m.Month == currentMonth) &&
-                (year == null || m.Year == currentYear)
-            );
+            Criteria = e => e.MonthlyData.Any(m => m.Month == currentMonth && m.Year == currentYear);
 
             if (!string.IsNullOrEmpty(branchName))
             {
@@ -80,7 +77,7 @@ namespace BLL.Specification
             {
                 AddFilter(e => e.Name.Contains(name));
             }
-            AddInclude(e => e.MonthlyData);
+            AddInclude(e => e.MonthlyData.Where(m => m.Month == currentMonth && m.Year == currentYear));
         }
     }
 }

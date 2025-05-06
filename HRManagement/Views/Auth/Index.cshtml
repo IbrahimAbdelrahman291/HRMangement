@@ -17,18 +17,22 @@
             background-color: #f3f4f6;
             font-family: Arial, sans-serif;
         }
+
         .login-container {
             width: 300px;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             background-color: white;
+            text-align: center; 
         }
+
         h2 {
             margin-bottom: 20px;
             font-size: 24px;
             text-align: center;
         }
+
         input[type="text"], input[type="password"] {
             width: 100%;
             padding: 10px;
@@ -36,6 +40,7 @@
             border: 1px solid #ddd;
             border-radius: 4px;
         }
+
         button {
             width: 100%;
             padding: 10px;
@@ -47,9 +52,10 @@
             cursor: pointer;
             transition: background-color 0.3s;
         }
-        button:hover {
-            background-color: #4338ca;
-        }
+
+            button:hover {
+                background-color: #4338ca;
+            }
 
         .message-box {
             position: fixed;
@@ -66,6 +72,12 @@
             transition: opacity 0.5s;
             opacity: 1;
         }
+
+        .logo {
+            width: 100px;
+            height: auto;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -78,7 +90,6 @@
                 if (messageBox) {
                     setTimeout(function () {
                         messageBox.style.display = 'none';
-
                         fetch('/RemoveMessageController/ClearMessage', { method: 'POST' });
                     }, 5000);
                 }
@@ -86,6 +97,7 @@
         </script>
     }
     <div class="login-container">
+        <img src="/images/logoHR.png" alt="Logo" class="logo">
         <h2>Login</h2>
         <form asp-action="Login" method="post">
             <input asp-for="UserName" placeholder="Username" required>
@@ -95,4 +107,3 @@
     </div>
 </body>
 </html>
-

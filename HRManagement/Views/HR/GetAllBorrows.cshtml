@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "GetAllBorrows";
     TempData.Keep("MonthlyEmployeeDataId");
+    TempData.Keep("FilterMonth");
+    TempData.Keep("FilterYear");
 }
 
 <!DOCTYPE html>
@@ -97,11 +99,13 @@
     <div class="container">
         <h1 style="margin: 0;">عرض السلف للموظف: @ViewBag.EmployeeName</h1>
         <div class="top-bar">
-            <a asp-action="GetAllEmployees" class="back-btn">رجوع</a>
+            <a asp-action="GetAllEmployees" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" class="back-btn">رجوع</a>
         </div>
 
         <form asp-action="AddBorrow" method="get" class="add-btn">
             <input type="hidden" name="MonthlyEmployeeDataId" value="@TempData["MonthlyEmployeeDataId"]" />
+            <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
+            <input type="hidden" name="year" value="@TempData["FilterYear"]" />
             <button type="submit" class="btn">اضافه سلفه</button>
         </form>
 
@@ -127,7 +131,9 @@
                         <td>@borrow.Notes</td>
                         <td>
                             <form asp-action="DeleteBorrow" method="post">
-                                <input type="hidden" name="id" value="@borrow.Id" />
+                                <input type="hidden" name="borrowId" value="@borrow.Id" />
+                                <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
+                                <input type="hidden" name="year" value="@TempData["FilterYear"]" />
                                 <button type="submit" class="btn btn-danger">حذف</button>
                             </form>
                         </td>

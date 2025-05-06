@@ -166,15 +166,6 @@
                 {
                     <tr>
                         <td>@employee.Id</td>
-                        <td>
-                            <form asp-action="UpdateEmployee" method="get">
-                                <input type="hidden" name="id" value="@employee.Id" />
-                                <input type="hidden" name="month" value="@employee.Month" />
-                                <input type="hidden" name="year" value="@employee.Year" />
-                                <button type="submit" class="btn">تعديل</button>
-                            </form>
-                        </td>
-                        
                         <td>@employee.Name</td>
                         <td>@employee.BranchName</td>
                         <td>@employee.Role</td>
@@ -188,11 +179,11 @@
                         <td>@employee.ForgetedHours</td>
                         <td>@employee.Holidaies</td>
                         <td>@employee.SalaryPerHour</td>
-                        <td>@Math.Round((double)employee.TotalSalary, 2).ToString("F2")</td>
+                        <td>@employee.TotalSalary</td>
                         <td>@employee.TotalBonuss</td>
                         <td>@employee.TotalBorrows</td>
                         <td>@employee.TotalDiscounts</td>
-                        <td>@Math.Round((double)employee.NetSalary, 2).ToString("F2")</td>
+                        <td>@employee.NetSalary</td>
                     </tr>
                 }
             </tbody>

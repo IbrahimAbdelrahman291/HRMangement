@@ -130,6 +130,7 @@ namespace HRManagement.Controllers
                     Year = currentYear,
                     Holidaies = 7,
                     Target = (model.Target) * 26,
+                    NetSalary = 0.0
                 };
                 await _context.MonthlyEmployeeData.AddAsync(monthlyData);
             }
@@ -144,6 +145,7 @@ namespace HRManagement.Controllers
                     Holidaies = 7,
                     TotalSalary = (model.SalaryPerHour * model.Hours??0) / 26,
                     Target = (model.Target) * 26,
+                    NetSalary = 0.0
                 };
                 _context.MonthlyEmployeeData.Add(monthlyData);
             }
@@ -165,6 +167,8 @@ namespace HRManagement.Controllers
 
             ViewBag.CurrentMonth = currentMonth;
             ViewBag.CurrentYear = currentYear;
+            TempData["FilterMonth"] = currentMonth;
+            TempData["FilterYear"] = currentYear;
 
             var employees = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec(currentMonth, currentYear, BranchName,BankName,Role,Name));
             var MappedEmployess = _mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeViewModel>>(employees);
@@ -452,7 +456,7 @@ namespace HRManagement.Controllers
             return View(model);
         }
         [HttpGet]
-        public IActionResult GetAllDiscounts(int monthlyEmployeeDataId)
+        public IActionResult GetAllDiscounts(int monthlyEmployeeDataId, int month, int year)
         {
             var discounts = _context.Discounts
                                     .Where(d => d.MonthlyEmployeeDataId == monthlyEmployeeDataId)
@@ -460,10 +464,12 @@ namespace HRManagement.Controllers
 
             var discountViewModels = _mapper.Map<List<DiscountViewModel>>(discounts);
             TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
             return View(discountViewModels);
         }
         [HttpGet]
-        public IActionResult GetAllBouns(int monthlyEmployeeDataId)
+        public IActionResult GetAllBouns(int monthlyEmployeeDataId,int month , int year)
         {
             var bouns = _context.Bounss
                         .Where(b => b.MonthlyEmployeeDataId == monthlyEmployeeDataId)
@@ -471,10 +477,12 @@ namespace HRManagement.Controllers
 
             var bounsViewModels = _mapper.Map<List<BounsViewModel>>(bouns);
             TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
             return View(bounsViewModels);
         }
         [HttpGet]
-        public IActionResult GetAllBorrows(int monthlyEmployeeDataId)
+        public IActionResult GetAllBorrows(int monthlyEmployeeDataId, int month, int year)
         {
             var borrows = _context.Borrows
                           .Where(b => b.MonthlyEmployeeDataId == monthlyEmployeeDataId)
@@ -482,69 +490,102 @@ namespace HRManagement.Controllers
 
             var borrowsViewModels = _mapper.Map<List<BorrowViewModel>>(borrows);
             TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
             return View(borrowsViewModels);
 
         }
         [HttpPost]
-        public async Task<IActionResult> DeleteDiscount(int discountId)
+        public async Task<IActionResult> DeleteDiscount(int discountId,int month,int year)
         {
-            var discount = await _context.Discounts.FindAsync(discountId);
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
+            var discount = await  _context.Discounts.Where(d => d.Id == discountId).FirstOrDefaultAsync();
 
             if (discount == null)
             {
-                return NotFound("الخصم غير موجود");
+                return RedirectToAction("GetAllEmployees", new { month = month, year = year });
             }
 
             int MonthlyDataId = discount.MonthlyEmployeeDataId;
 
             _context.Discounts.Remove(discount);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = MonthlyDataId });
+            int result = await _context.SaveChangesAsync();
+            if (result > 0)
+            {
+                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = MonthlyDataId , month = month , year = year });
+            }
+            return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = MonthlyDataId , month = month , year = year });
         }
         [HttpPost]
-        public async Task<IActionResult> DeleteBorrow(int discountId)
+        public async Task<IActionResult> DeleteBorrow(int borrowId, int month, int year)
         {
-            var borrow = await _context.Borrows.FindAsync(discountId);
-
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
+            var borrow = await _context.Borrows.Where(d => d.Id == borrowId).FirstOrDefaultAsync();
+            int MonthlyDataId = borrow.MonthlyEmployeeDataId;
             if (borrow == null)
             {
-                return NotFound("الخصم غير موجود");
+                return RedirectToAction("GetAllBorrows",new { monthlyEmployeeDataId = MonthlyDataId, month = month, year = year });
             }
-            int MonthlyDataId = borrow.MonthlyEmployeeDataId;
+            
 
             _context.Borrows.Remove(borrow);
-            await _context.SaveChangesAsync();
-
-            return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = MonthlyDataId });
-        }
-        [HttpPost]
-        public async Task<IActionResult> DeleteBouns(int discountId)
-        {
-            var bouns = await _context.Bounss.FindAsync(discountId);
-
-            if (bouns == null)
+            int result = await _context.SaveChangesAsync();
+            if (result > 0)
             {
-                return NotFound("الخصم غير موجود");
+               return RedirectToAction("GetAllBorrows", new { monthlyEmployeeDataId = MonthlyDataId , month = month , year = year });
             }
 
+            return RedirectToAction("GetAllBorrows", new { monthlyEmployeeDataId = MonthlyDataId });
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteBouns(int bonusId, int month, int year)
+        {
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
+            var bouns = await _context.Bounss.Where(d => d.Id == bonusId).FirstOrDefaultAsync();
             int MonthlyDataId = bouns.MonthlyEmployeeDataId;
+            if (bouns == null)
+            {
+                return RedirectToAction("GetAllBouns",new { monthlyEmployeeDataId = MonthlyDataId, month = month, year = year });
+            }
+
+            
 
             _context.Bounss.Remove(bouns);
-            await _context.SaveChangesAsync();
+            int result = await _context.SaveChangesAsync();
+            if (result > 0)
+            {
+                return RedirectToAction("GetAllBouns", new { monthlyEmployeeDataId = MonthlyDataId , month = month , year = year });
+            }
 
-            return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = MonthlyDataId });
+            return RedirectToAction("GetAllBouns", new { monthlyEmployeeDataId = MonthlyDataId, month = month, year = year });
         }
         [HttpGet]
-        public IActionResult AddDiscount(int monthlyEmployeeDataId)
+        public IActionResult AddDiscount(int monthlyEmployeeDataId,int month,int year)
         {
             TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
             TempData.Keep("MonthlyEmployeeDataId");
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> AddDiscount(DiscountViewModel model)
+        public async Task<IActionResult> AddDiscount(DiscountViewModel model,int month,int year)
         {
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
             var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
             var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
 
@@ -552,7 +593,7 @@ namespace HRManagement.Controllers
                 .FirstOrDefaultAsync(m => m.Id == model.MonthlyEmployeeDataId);
             if (monthlyData == null)
             {
-                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
+                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year });
             }
             var discount = new Discounts
             {
@@ -568,18 +609,26 @@ namespace HRManagement.Controllers
             await _context.Discounts.AddAsync(discount);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
+            return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year });
         }
         [HttpGet]
-        public IActionResult AddBouns(int monthlyEmployeeDataId)
+        public IActionResult AddBouns(int monthlyEmployeeDataId,int month,int year)
         {
             TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
             TempData.Keep("MonthlyEmployeeDataId");
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> AddBouns(BounsViewModel model)
+        public async Task<IActionResult> AddBouns(BounsViewModel model, int month, int year)
         {
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
             var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
             var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
 
@@ -587,7 +636,7 @@ namespace HRManagement.Controllers
                 .FirstOrDefaultAsync(m => m.Id == model.MonthlyEmployeeDataId);
             if (monthlyData == null)
             {
-                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
+                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year });
             }
             
             var bouns = new Bouns
@@ -604,25 +653,33 @@ namespace HRManagement.Controllers
             await _context.Bounss.AddAsync(bouns);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("GetAllBouns", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
+            return RedirectToAction("GetAllBouns", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year });
         }
         [HttpGet]
-        public IActionResult AddBorrow(int monthlyEmployeeDataId)
+        public IActionResult AddBorrow(int monthlyEmployeeDataId, int month, int year)
         {
             TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
             TempData.Keep("MonthlyEmployeeDataId");
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> AddBorrow(BorrowViewModel model)
+        public async Task<IActionResult> AddBorrow(BorrowViewModel model, int month, int year)
         {
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
             var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
             var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
             var monthlyData = await _context.MonthlyEmployeeData
                         .FirstOrDefaultAsync(m => m.Id == model.MonthlyEmployeeDataId);
             if (monthlyData == null)
             {
-                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
+                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId , month = month , year = year });
             }
             var borrow = new Borrow
             {
@@ -638,7 +695,7 @@ namespace HRManagement.Controllers
             await _context.Borrows.AddAsync(borrow);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("GetAllBorrows", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId });
+            return RedirectToAction("GetAllBorrows", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year });
         }
         [HttpGet]
         public IActionResult GetAllPendResignations(string? message) 
@@ -976,6 +1033,102 @@ namespace HRManagement.Controllers
             var mappedRequests = _mapper.Map<IEnumerable<RequestBorrowViewModel>>(requests);
             return View(mappedRequests);
         }
+        [HttpGet]
+        public async Task<IActionResult> GetAllComplaints(string? message)
+        {
+            var complaints = await _context.Complaints.Where(c => c.status == "Pending")
+                .Include(c => c.Employee)
+                .ToListAsync();
+            var mappedComplaints = _mapper.Map<IEnumerable<ComplaintsViewModle>>(complaints);
+            ViewBag.Message = message;
+            return View(mappedComplaints);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetComplaintsArchive()
+        {
+            var complaints = await _context.Complaints
+                .Where(c => c.status == "مرفوض" || c.status == "مقبول")
+                .Include(c => c.Employee)
+                .ToListAsync();
 
+            var mappedComplaints = _mapper.Map<IEnumerable<ComplaintsViewModle>>(complaints);
+            return View(mappedComplaints);
+        }
+        [HttpGet]
+        public async Task<IActionResult> ApproveComplaint(int id)
+        {
+            var complaint = await _context.Complaints
+                .Include(c => c.Employee)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (complaint == null)
+            {
+                return RedirectToAction("GetAllComplaints", new { message = "الطلب غير موجود" });
+            }
+
+            var mappedComplaint = _mapper.Map<ComplaintsViewModle>(complaint);
+            return View(mappedComplaint);
+        }
+        [HttpPost]
+        public async Task<IActionResult> ApproveComplaint(ComplaintsViewModle model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var complaint = await _context.Complaints.FindAsync(model.Id);
+                if (complaint == null)
+                {
+                    return RedirectToAction("GetAllComplaints", new { message = "الطلب غير موجود" });
+                }
+
+                complaint.status = "مقبول";
+                complaint.response = model.response;
+                _context.Complaints.Update(complaint);
+
+                int result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    return RedirectToAction("GetAllComplaints", new { message = "تم قبول الشكوى" });
+                }
+            }
+            return View(model);
+        }
+        [HttpGet]
+        public async Task<IActionResult> RejectComplaint(int id)
+        {
+            var complaint = await _context.Complaints
+                .Include(c => c.Employee)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (complaint == null)
+            {
+                return RedirectToAction("GetAllComplaints", new { message = "الطلب غير موجود" });
+            }
+
+            var mappedComplaint = _mapper.Map<ComplaintsViewModle>(complaint);
+            return View(mappedComplaint);
+        }
+        [HttpPost]
+        public async Task<IActionResult> RejectComplaint(ComplaintsViewModle model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var complaint = await _context.Complaints.FindAsync(model.Id);
+                if (complaint == null)
+                {
+                    return RedirectToAction("GetAllComplaints", new { message = "الطلب غير موجود" });
+                }
+
+                complaint.status = "مرفوض";
+                complaint.response = model.response;
+                _context.Complaints.Update(complaint);
+
+                int result = await _context.SaveChangesAsync();
+                if (result > 0)
+                {
+                    return RedirectToAction("GetAllComplaints", new { message = "تم رفض الشكوى" });
+                }
+            }
+            return View(model);
+        }
     }
 }

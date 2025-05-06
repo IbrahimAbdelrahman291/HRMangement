@@ -1,7 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Index";
 }
-
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
@@ -110,9 +109,10 @@
             #test:hover {
                 background-color: #0056b3;
             }
-                .card a:hover {
-                    background: #0056b3;
-                }
+
+        .card a:hover {
+            background: #0056b3;
+        }
 
         .message-box {
             position: fixed;
@@ -128,6 +128,13 @@
             width: fit-content;
             transition: opacity 0.5s;
             opacity: 1;
+        }
+
+        .logo {
+            width: 100px;
+            height: auto;
+            margin: 20px auto;
+            display: block;
         }
     </style>
 </head>
@@ -147,8 +154,6 @@
                 if (messageBox) {
                     setTimeout(function () {
                         messageBox.style.display = 'none';
-
-                        // بعد إخفاء الرسالة، ابعت الـ fetch لتمسحها
                         fetch('/RemoveMessageController/ClearMessage', { method: 'POST' });
                     }, 5000);
                 }
@@ -156,6 +161,7 @@
         </script>
     }
 
+    <img src="/images/logoHR.png" alt="Logo" class="logo">
     <div class="instructions-box">
         <h3>تعليمات لل HR:</h3>
         <p>-عند اضافه موظف يجب ادخال اسم مستخدم وباسورد باللغه الانجليزيه فقط</p>
@@ -167,6 +173,7 @@
     </div>
 
     <h1>لوحة التحكم</h1>
+
     <div class="container">
         <div class="card">
             <h2>إضافة موظف جديد</h2>
@@ -203,7 +210,13 @@
             <p>عرض جميع الطلبات</p>
             <a asp-action="GetAllRequestBorrow">عرض الطلبات</a>
         </div>
+        <div class="card">
+            <h2>الشكوى</h2>
+            <p>عرض جميع الشكوى</p>
+            <a asp-action="GetAllComplaints">عرض</a>
+        </div>
     </div>
+
     <footer style="margin-top: 50px; text-align: center; padding: 15px; background-color: #f4f4f4; color: #555; font-size: 14px;">
         © Copyright
         <a href="https://opshan.github.io/home" target="_blank" style="color: #007bff; text-decoration: none;">

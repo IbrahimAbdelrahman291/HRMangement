@@ -94,13 +94,20 @@
                 color: #333;
                 margin: 5px 0;
             }
+
+        .logo {
+            width: 100px;
+            height: auto;
+            margin: 20px auto;
+            display: block;
+        }
     </style>
 </head>
 <body>
     <form asp-action="Logout" asp-controller="Auth" method="post">
         <button type="submit" class="logout-btn">تسجيل الخروج</button>
     </form>
-
+    <img src="/images/logoHR.png" alt="Logo" class="logo">
     <h1>لوحة التحكم</h1>
     <div class="container">
         <div class="card">

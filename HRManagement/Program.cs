@@ -73,6 +73,8 @@ namespace HRManagement
                     "0 0 1 * *" // CRON expression: ??? 1 ?? ?? ???
             );
             app.UseHttpsRedirection();
+            
+
             app.UseStaticFiles();
 
             app.UseRouting();

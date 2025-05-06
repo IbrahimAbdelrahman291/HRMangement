@@ -32,7 +32,7 @@ namespace HRManagement.Controllers
         }
         
         [HttpGet]
-        public async Task<IActionResult> GetAllEmployees(int? month = null, int? year = null,string? BranchName = null,string? message = null)
+        public async Task<IActionResult> GetAllEmployees(int? month = null, int? year = null, string? BranchName = null, string? Role = null, string? BankName = null, string? Name = null)
         {
             var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
             var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
@@ -42,14 +42,34 @@ namespace HRManagement.Controllers
             var currentMonth = month ?? egyptDate.Month;
             var currentYear = year ?? egyptDate.Year;
 
+            var employees = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec(currentMonth, currentYear, BranchName, BankName, Role, Name));
+            var MappedEmployess = _mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeViewModel>>(employees);
 
-            var employees = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec(currentMonth, currentYear, BranchName));
-            var mappedEmployees = _mapper.Map<IEnumerable<Employee>, IEnumerable<EmployeeViewModel>>(employees);
-            ViewBag.Message = message;
-            return View(mappedEmployees);
+            var uniqueBranchNames = employees
+                .Where(e => !string.IsNullOrEmpty(e.BranchName))
+                .Select(e => e.BranchName)
+                .Distinct()
+                .ToList();
+
+            var uniqBankName = employees.Where(e => !string.IsNullOrEmpty(e.BankName))
+                .Select(e => e.BankName)
+                .Distinct()
+                .ToList();
+            var uniqRole = employees.Where(e => !string.IsNullOrEmpty(e.Role))
+                .Select(e => e.Role)
+                .Distinct()
+                .ToList();
+            ViewData["BranchNames"] = uniqueBranchNames;
+            ViewData["BankNames"] = uniqBankName;
+            ViewData["Roles"] = uniqRole;
+
+            var totalNetSalary = MappedEmployess.Sum(e => e.NetSalary);
+            ViewData["TotalNetSalary"] = totalNetSalary;
+
+            return View(MappedEmployess);
         }
         [HttpPost]
-        public async Task<IActionResult> DeleteEmployee([FromForm] int id) 
+        public async Task<IActionResult> DeleteEmployee(int id) 
         {
             var Employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(id));
             var UserId = Employee.UserId;
