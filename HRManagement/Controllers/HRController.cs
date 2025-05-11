@@ -263,12 +263,12 @@ namespace HRManagement.Controllers
             return View(mappedEmployee);
         }
         [HttpPost]
-        public async Task<IActionResult> UpdateEmployee(EmployeeViewModel model)
+        public async Task<IActionResult> UpdateEmployee(EmployeeViewModel model,string name)
         {
             var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(model.Id));
             if (employee == null)
             {
-                return RedirectToAction("GetAllEmployees", new { message = "الموظف غير موجود" });
+                return RedirectToAction("GetAllEmployees", new { message = "الموظف غير موجود" , Name = name});
             }
 
             employee.Name = model.Name;
@@ -320,7 +320,7 @@ namespace HRManagement.Controllers
 
             if (result > 0)
             {
-                return RedirectToAction("GetAllEmployees",new { message = "تم التعديل بنجاح"});
+                return RedirectToAction("GetAllEmployees",new { message = "تم التعديل بنجاح",Name = name});
             }
 
             return View(model);
