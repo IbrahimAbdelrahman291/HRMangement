@@ -1,6 +1,7 @@
 ﻿@model EmployeeViewModel
 @{
     ViewData["Title"] = "Update Employee";
+    TempData.Keep("FilterName");
 }
 
 <html lang="ar">
@@ -138,7 +139,7 @@
         </form>
 
         <div class="back-link-container">
-            <a asp-action="GetAllEmployees" asp-route-month="@Model.Month" asp-route-year="@Model.Year" class="btn-secondary-link">
+            <a asp-action="GetAllEmployees" asp-route-month="@Model.Month" asp-route-year="@Model.Year" asp-route-Name="@TempData["FilterName"]" class="btn-secondary-link">
                 رجوع
             </a>
         </div>

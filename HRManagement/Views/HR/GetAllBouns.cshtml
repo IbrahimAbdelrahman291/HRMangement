@@ -4,6 +4,8 @@
     TempData.Keep("MonthlyEmployeeDataId");
     TempData.Keep("FilterMonth");
     TempData.Keep("FilterYear");
+    TempData.Keep("FilterName");
+    TempData.Keep("FilterName");
 }
 
 <!DOCTYPE html>
@@ -100,13 +102,14 @@
     <div class="container">
         <h1>عرض البونصات للموظف: @ViewBag.EmployeeName</h1>
         <div class="top-bar">
-            <a asp-action="GetAllEmployees" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" class="back-btn">رجوع</a>
+            <a asp-action="GetAllEmployees" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" asp-route-Name="@TempData["FilterName"]" class="back-btn">رجوع</a>
         </div>
 
         <form asp-action="AddBouns" method="get" class="add-btn">
             <input type="hidden" name="MonthlyEmployeeDataId" value="@TempData["MonthlyEmployeeDataId"]" />
             <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
             <input type="hidden" name="year" value="@TempData["FilterYear"]" />
+            <input type="hidden" name="name" value="@TempData["FilterName"]" />
         <button type="submit" class="btn">اضافه بونص</button>
         </form>
 
@@ -135,6 +138,7 @@
                                 <input type="hidden" name="bonusId" value="@bouns.Id" />
                                 <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
                                 <input type="hidden" name="year" value="@TempData["FilterYear"]" />
+                                <input type="hidden" name="name" value="@TempData["FilterName"]" />
                                 <button type="submit" class="btn btn-danger">حذف</button>
                             </form>
                         </td>
