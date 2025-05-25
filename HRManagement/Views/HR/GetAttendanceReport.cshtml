@@ -1,7 +1,13 @@
 ﻿@model IEnumerable<WorkLogsViewModel>
 @{
     ViewData["Title"] = "GetAttendanceReport";
-    var Date = TempData["Date"] is DateTime dt ? dt : (DateTime?)null;
+    var Branches = TempData["Branches"];
+    TempData.Keep("FilterStartDate");
+    TempData.Keep("FilterEndDate");
+    TempData.Keep("EmployeeId");
+    TempData.Keep("EmployeeName");
+    TempData.Keep("BranchName");
+    TempData.Keep("Branches");
 }
 <html lang="ar">
 <head>
@@ -61,15 +67,20 @@
 
         .form-inline-date {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             gap: 10px;
             align-items: center;
             margin-bottom: 30px;
         }
 
-            .form-inline-date input[type="date"] {
+            .form-inline-date input[type="date"],
+            .form-inline-date input[type="text"],
+            .form-inline-date select {
                 padding: 5px;
                 font-size: 14px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
             }
 
         .filter-btn {
@@ -118,7 +129,12 @@
 
     <div class="action-buttons">
         <form asp-action="GetForgetedAttendeeThatEndShift" method="get">
-            <input type="hidden" name="date" value="@Date" />
+            <input type="hidden" name="StartDate" value="@TempData["FilterStartDate"]" />
+            <input type="hidden" name="EndDate" value="@TempData["FilterEndDate"]" />
+            <input type="hidden" name="EmployeeId" value="@TempData["EmployeeId"]" />
+            <input type="hidden" name="EmployeeName" value="@TempData["EmployeeName"]" />
+            <input type="hidden" name="BranchName" value="@TempData["BranchName"]" />
+            
             <button type="submit" class="small-btn">الشيفتات المنسية</button>
         </form>
         <button class="export-button" onclick="exportTableToExcel()">تصدير إلى Excel</button>
@@ -128,15 +144,43 @@
     </div>
 
     <form asp-action="GetAttendanceReport" method="get" class="form-inline-date">
-        <label for="date">اختر التاريخ:</label>
-        <input type="date" name="date" class="form-control" />
-        <button type="submit" class="filter-btn">تطبيق الفلتر</button>
+        <div>
+            <label for="StartDate">من تاريخ:</label>
+            <input type="date" name="StartDate" class="form-control" />
+        </div>
+        <div>
+            <label for="EndDate">إلى تاريخ:</label>
+            <input type="date" name="EndDate" class="form-control" />
+        </div>
+        <div>
+            <input type="number" name="EmployeeId" class="form-control" placeholder="بحث بـ ID الموظف" />
+        </div>
+        <div>
+            <input type="text" name="EmployeeName" class="form-control" placeholder="بحث باسم الموظف" />
+        </div>
+        <div>
+            <select name="BranchName" class="form-control">
+                <option value="">اختر اسم الفرع</option>
+                @if (Branches is List<string> branchList)
+                {
+                    foreach (var branch in branchList)
+                    {
+                        <option value="@branch">@branch</option>
+                    }
+                }
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="filter-btn">تطبيق الفلتر</button>
+        </div>
     </form>
 
     <table>
         <thead>
             <tr>
+                <th>الرقم التعريفي</th>
                 <th>اسم الموظف</th>
+                <th>الفرع</th>
                 <th>التاريخ</th>
                 <th>البداية</th>
                 <th>النهاية</th>
@@ -149,7 +193,9 @@
                 foreach (var item in Model)
                 {
                     <tr>
+                        <td>@item.EmployeeId</td>
                         <td>@item.EmployeeName</td>
+                        <td>@item.BranchName</td>
                         <td>@item.Day</td>
                         <td>@item.Start</td>
                         <td>@item.End</td>
@@ -160,7 +206,7 @@
             else
             {
                 <tr>
-                    <td colspan="5">لا توجد بيانات لعرضها</td>
+                    <td colspan="7">لا توجد بيانات لعرضها</td>
                 </tr>
             }
         </tbody>

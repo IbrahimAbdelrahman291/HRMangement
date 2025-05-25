@@ -16,5 +16,36 @@ namespace BLL.Specification
             AddFilter(w => w.Day == date);
             AddInclude(w => w.Employee);
         }
+        public WorkLogsSpec(DateTime? StartDate = null, DateTime? EndDate = null, int? EmployeeId = null, string? EmployeeName = null, string? BranchName = null) : base()
+        {
+            if (StartDate.HasValue)
+            {
+                var startDateOnly = DateOnly.FromDateTime(StartDate.Value.Date);
+                AddFilter(w => w.Day >= startDateOnly);
+            }
+
+            if (EndDate.HasValue)
+            {
+                var endDateOnly = DateOnly.FromDateTime(EndDate.Value.Date);
+                AddFilter(w => w.Day <= endDateOnly);
+            }
+
+            if (EmployeeId.HasValue)
+            {
+                AddFilter(w => w.EmployeeId == EmployeeId.Value);
+            }
+
+            if (!string.IsNullOrEmpty(EmployeeName))
+            {
+                AddFilter(w => w.Employee.Name.Contains(EmployeeName));
+            }
+
+            if (!string.IsNullOrEmpty(BranchName))
+            {
+                AddFilter(w => w.Employee.BranchName == BranchName);
+            }
+
+            AddInclude(w => w.Employee);
+        }
     }
 }

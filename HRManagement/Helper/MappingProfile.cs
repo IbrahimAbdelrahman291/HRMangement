@@ -76,7 +76,9 @@ namespace HRManagement.Helper
                 .ForMember(dest => dest.Employee, opt => opt.Ignore());
             // WorkLogs Mapping
             CreateMap<WorkLogs, WorkLogsViewModel>()
-            .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name));
+            .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name))
+            .ForMember(dest => dest.BranchName, opt => opt.MapFrom(src => src.Employee.BranchName));
+
 
             CreateMap<WorkLogsViewModel, WorkLogs>();
 

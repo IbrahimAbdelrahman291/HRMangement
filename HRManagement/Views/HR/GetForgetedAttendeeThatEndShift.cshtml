@@ -1,7 +1,11 @@
 ﻿@model IEnumerable<WorkLogsViewModel>
 @{
     ViewData["Title"] = "GetForgetedAttendeeThatEndShift";
-    var Date = TempData["Date"] is DateTime dt ? dt : (DateTime?)null;
+    TempData.Keep("FilterStartDate");
+    TempData.Keep("FilterEndDate");
+    TempData.Keep("EmployeeId");
+    TempData.Keep("EmployeeName");
+    TempData.Keep("BranchName");
 }
 <html lang="ar">
 <head>
@@ -119,7 +123,12 @@
     <div class="action-buttons">
         <button class="export-button" onclick="exportTableToExcel()">تصدير إلى Excel</button>
         <form asp-action="GetAttendanceReport" method="get">
-            <input type="hidden" name="date" value="@Date" />
+            <input type="hidden" name="StartDate" value="@TempData["FilterStartDate"]" />
+            <input type="hidden" name="EndDate" value="@TempData["FilterEndDate"]" />
+            <input type="hidden" name="EmployeeId" value="@TempData["EmployeeId"]" />
+            <input type="hidden" name="EmployeeName" value="@TempData["EmployeeName"]" />
+            <input type="hidden" name="BranchName" value="@TempData["BranchName"]" />
+
             <button type="submit" class="small-btn">رجوع</button>
         </form>
     </div>

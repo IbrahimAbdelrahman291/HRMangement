@@ -11,6 +11,7 @@ namespace HRManagement.ViewModel
         public TimeSpan TotalTime { get; set; }
         public DateOnly Day { get; set; }
         public int EmployeeId { get; set; }
+        public string BranchName { get; set; }
         public string EmployeeName { get; set; }
     }
 }
