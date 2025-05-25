@@ -4,7 +4,7 @@
     ViewData["Title"] = "AddDiscount";
     TempData.Keep("FilterMonth");
     TempData.Keep("FilterYear");
-    TempData.Keep("FilterName");
+    TempData.Keep("FilterBranch");
 
 
 }
@@ -83,7 +83,7 @@
             <input type="hidden" asp-for="MonthlyEmployeeDataId" value="@TempData["MonthlyEmployeeDataId"]" />
             <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
             <input type="hidden" name="year" value="@TempData["FilterYear"]" />
-            <input type="hidden" name="name" value="@TempData["FilterName"]" />
+            <input type="hidden" name="branch" value="@TempData["FilterBranch"]" />
 
             <label for="Amount">المبلغ</label>
             <input asp-for="Amount" type="number" placeholder="المبلغ" required />
@@ -100,7 +100,7 @@
             <button type="submit">إضافة</button>
         </form>
         <div style="text-align: center;">
-            <a asp-action="GetAllDiscounts" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" asp-route-name="@TempData["FilterName"]" class="back-btn">رجوع</a>
+            <a asp-action="GetAllDiscounts" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" asp-route-branch="@TempData["FilterBranch"]" class="back-btn">رجوع</a>
         </div>
     </div>
 </body>

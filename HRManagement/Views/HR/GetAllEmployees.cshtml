@@ -6,7 +6,7 @@
     var Roles = ViewData["Roles"] as List<string> ?? new List<string>();
     TempData.Keep("FilterMonth");
     TempData.Keep("FilterYear");
-    TempData.Keep("FilterName");
+    TempData.Keep("FilterBranch");
 }
 
 <html lang="ar">
@@ -185,7 +185,7 @@
                                 <input type="hidden" name="monthlyEmployeeDataId" value="@employee.MonthlyEmployeeDataId" />
                                 <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
                                 <input type="hidden" name="year" value="@TempData["FilterYear"]" />
-                                <input type="hidden" name="name" value="@TempData["FilterName"]" />
+                                <input type="hidden" name="branch" value="@TempData["FilterBranch"]" />
                                 <button type="submit" class="btn">خصم</button>
                             </form>
                         </td>
@@ -194,7 +194,7 @@
                                 <input type="hidden" name="monthlyEmployeeDataId" value="@employee.MonthlyEmployeeDataId" />
                                 <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
                                 <input type="hidden" name="year" value="@TempData["FilterYear"]" />
-                                <input type="hidden" name="name" value="@TempData["FilterName"]" />
+                                <input type="hidden" name="branch" value="@TempData["FilterBranch"]" />
                                 <button type="submit" class="btn">سلفه</button>
                             </form>
                         </td>
@@ -203,7 +203,7 @@
                                 <input type="hidden" name="monthlyEmployeeDataId" value="@employee.MonthlyEmployeeDataId" />
                                 <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
                                 <input type="hidden" name="year" value="@TempData["FilterYear"]" />
-                                <input type="hidden" name="name" value="@TempData["FilterName"]" />
+                                <input type="hidden" name="branch" value="@TempData["FilterBranch"]" />
                                 <button type="submit" class="btn">الزيادات</button>
                             </form>
                         </td>

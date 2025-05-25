@@ -4,8 +4,7 @@
     TempData.Keep("MonthlyEmployeeDataId");
     TempData.Keep("FilterMonth");
     TempData.Keep("FilterYear");
-    TempData.Keep("FilterName");
-    TempData.Keep("FilterName");
+    TempData.Keep("FilterBranch");
 }
 
 <!DOCTYPE html>
@@ -101,14 +100,14 @@
     <div class="container">
         <h1 style="margin: 0;">عرض السلف للموظف: @ViewBag.EmployeeName</h1>
         <div class="top-bar">
-            <a asp-action="GetAllEmployees" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" asp-route-Name="@TempData["FilterName"]" class="back-btn">رجوع</a>
+            <a asp-action="GetAllEmployees" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" asp-route-BranchName="@TempData["FilterBranch"]" class="back-btn">رجوع</a>
         </div>
 
         <form asp-action="AddBorrow" method="get" class="add-btn">
             <input type="hidden" name="MonthlyEmployeeDataId" value="@TempData["MonthlyEmployeeDataId"]" />
             <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
             <input type="hidden" name="year" value="@TempData["FilterYear"]" />
-            <input type="hidden" name="name" value="@TempData["FilterName"]" />
+            <input type="hidden" name="branch" value="@TempData["FilterBranch"]" />
             <button type="submit" class="btn">اضافه سلفه</button>
         </form>
 
@@ -137,7 +136,7 @@
                                 <input type="hidden" name="borrowId" value="@borrow.Id" />
                                 <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
                                 <input type="hidden" name="year" value="@TempData["FilterYear"]" />
-                                <input type="hidden" name="name" value="@TempData["FilterName"]" />
+                                <input type="hidden" name="branch" value="@TempData["FilterBranch"]" />
                                 <button type="submit" class="btn btn-danger">حذف</button>
                             </form>
                         </td>

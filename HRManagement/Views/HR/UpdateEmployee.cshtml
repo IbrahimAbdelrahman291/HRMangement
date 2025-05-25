@@ -1,7 +1,7 @@
 ﻿@model EmployeeViewModel
 @{
     ViewData["Title"] = "Update Employee";
-    TempData.Keep("FilterName");
+    TempData.Keep("FilterBranch");
 }
 
 <html lang="ar">
@@ -83,56 +83,55 @@
     <h1 style="text-align: center;">تعديل بيانات الموظف</h1>
 
     <div class="container">
-        <form asp-action="UpdateEmployee" method="post">
+        <form asp-action="UpdateEmployee" method="post" asp-route-branch="@TempData["FilterBranch"]">
             <input type="hidden" name="Id" value="@Model.Id" />
             <input type="hidden" name="Month" value="@Model.Month" />
             <input type="hidden" name="Year" value="@Model.Year" />
-            <input type="hidden" name="name" value="@TempData["FilterName"]" />
 
             <label>اسم الموظف:</label>
-            <input type="text" name="Name" value="@Model.Name" required />
+            <input type="text" asp-for="Name"  required />
 
             <label>اسم الفرع:</label>
-            <input type="text" name="BranchName" value="@Model.BranchName" required />
+            <input type="text" asp-for="BranchName"  required />
 
             <label>الدور الوظيفي:</label>
-            <input type="text" name="Role" value="@Model.Role" required />
+            <input type="text" asp-for="Role"  required />
 
             <label>اسم البنك:</label>
-            <input type="text" name="BankName" value="@Model.BankName" />
+            <input type="text" asp-for="BankName"  />
 
             <label>رقم الحساب البنكي:</label>
-            <input type="text" name="BankAccount" value="@Model.BankAccount" />
+            <input type="text" asp-for="BankAccount"  />
 
             <label>عدد الساعات:</label>
-            <input type="number" name="Hours" value="@Model.Hours" step="0.01" />
+            <input type="number" asp-for="Hours"  step="0.01" />
 
             <label>ساعات إضافية:</label>
-            <input type="number" name="HoursOverTime" value="@Model.HoursOverTime" step="0.01" />
+            <input type="number" asp-for="HoursOverTime"  step="0.01" />
 
             <label>ساعات منسيه:</label>
-            <input type="number" name="ForgetedHours" value="@Model.ForgetedHours" step="0.01" />
+            <input type="number" asp-for="ForgetedHours"  step="0.01" />
 
             <label>التارجت:</label>
-            <input type="number" name="Target" value="@Model.Target" step="0.01" />
+            <input type="number" asp-for="Target"  step="0.01" />
 
             <label>اجمالي الخصومات:</label>
-            <input type="number" name="TotalDiscounts" value="@Model.TotalDiscounts" step="0.01" />
+            <input type="number" asp-for="TotalDiscounts"  step="0.01" />
 
             <label>اجمالي السلف:</label>
-            <input type="number" name="TotalBorrows" value="@Model.TotalBorrows" step="0.01" />
+            <input type="number" asp-for="TotalBorrows"  step="0.01" />
             
             <label>اجمالي الزيادات:</label>
-            <input type="number" name="TotalBonuss" value="@Model.TotalBonuss" step="0.01" />
+            <input type="number" asp-for="TotalBonuss"  step="0.01" />
 
             <label>الراتب لكل ساعة:</label>
-            <input type="number" name="SalaryPerHour" value="@Model.SalaryPerHour" step="0.01" />
+            <input type="number" asp-for="SalaryPerHour"  step="0.01" />
 
             <label>إجمالي الراتب:</label>
-            <input type="number" name="TotalSalary" value="@Model.TotalSalary" step="0.01" />
+            <input type="number" asp-for="TotalSalary"  step="0.01" />
 
             <label>صافي المرتب:</label>
-            <input type="number" name="NetSalary" value="@Model.NetSalary" step="0.01" />
+            <input type="number" asp-for="NetSalary"  step="0.01" />
 
             <div class="buttons">
                 <button type="submit" class="btn btn-primary">حفظ التعديل</button>
@@ -140,7 +139,7 @@
         </form>
 
         <div class="back-link-container">
-            <a asp-action="GetAllEmployees" asp-route-month="@Model.Month" asp-route-year="@Model.Year" asp-route-Name="@TempData["FilterName"]" class="btn-secondary-link">
+            <a asp-action="GetAllEmployees" asp-route-month="@Model.Month" asp-route-year="@Model.Year" asp-route-BranchName="@TempData["FilterBranch"]" class="btn-secondary-link">
                 رجوع
             </a>
         </div>
