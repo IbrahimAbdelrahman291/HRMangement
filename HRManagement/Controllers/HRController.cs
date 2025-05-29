@@ -851,6 +851,7 @@ namespace HRManagement.Controllers
 
 
             var AllAttendee = await _worklogsRepo.GetAllWithSpecAsync(new WorkLogsSpec(StartDate, EndDate, EmployeeId, EmployeeName, BranchName));
+            AllAttendee = AllAttendee.OrderBy(e => e.Day);
             var MappedAttendee = _mapper.Map<IEnumerable<WorkLogsViewModel>>(AllAttendee);
             var uniqueBranchNames = _dbContext.WorkLogs
                 .Where(e => !string.IsNullOrEmpty(e.Employee.BranchName)).Select(s => s.Employee.BranchName)
@@ -911,7 +912,40 @@ namespace HRManagement.Controllers
             TempData.Keep("BranchName");
             return View(Result);
         }
+        [HttpGet]
+        public async Task<IActionResult> EmployeeThatDoesntStartShift(DateTime? StartDate = null, DateTime? EndDate = null, int? EmployeeId = null, string? EmployeeName = null, string? BranchName = null) 
+        {
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+            if (StartDate is not null && EndDate is not null)
+            {
+                egyptDate = DateOnly.FromDateTime((DateTime)StartDate);
+            }
+            var worklogs = await _worklogsRepo.GetAllWithSpecAsync(new WorkLogsSpec(egyptDate));
+            var employees = await _empRepo.GetAllWithSpecAsync(new EmployeeSpec());
+            List<Employee> employeesWhoDidNotWorkToday;
+            if (worklogs.Any() && employees.Any())
+            {
+                employeesWhoDidNotWorkToday = employees.Where(e => !worklogs.Any(w => w.EmployeeId == e.Id)).ToList();
+            }
+            else
+            {
+                employeesWhoDidNotWorkToday = new List<Employee>();
+            }
+            TempData["FilterStartDate"] = StartDate;
+            TempData["FilterEndDate"] = EndDate;
+            TempData["EmployeeId"] = EmployeeId;
+            TempData["EmployeeName"] = EmployeeName;
+            TempData["BranchName"] = BranchName;
+            TempData.Keep("FilterStartDate");
+            TempData.Keep("FilterEndDate");
+            TempData.Keep("EmployeeId");
+            TempData.Keep("EmployeeName");
+            TempData.Keep("BranchName");
+            return View(employeesWhoDidNotWorkToday);
 
+        }
         //Forgeted Shifts
         [HttpGet]
         public async Task<IActionResult> GetAllForgetedShiftsRequests(string? message)

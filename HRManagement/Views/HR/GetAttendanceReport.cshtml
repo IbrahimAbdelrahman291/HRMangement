@@ -128,6 +128,14 @@
     <h2>تقرير الحضور</h2>
 
     <div class="action-buttons">
+        <form asp-action="EmployeeThatDoesntStartShift" method="get">
+            <input type="hidden" name="StartDate" value="@TempData["FilterStartDate"]" />
+            <input type="hidden" name="EndDate" value="@TempData["FilterEndDate"]" />
+            <input type="hidden" name="EmployeeId" value="@TempData["EmployeeId"]" />
+            <input type="hidden" name="EmployeeName" value="@TempData["EmployeeName"]" />
+            <input type="hidden" name="BranchName" value="@TempData["BranchName"]" />
+            <button type="submit" class="small-btn">موظفين لم يحضروا</button>
+        </form>
         <form asp-action="GetForgetedAttendeeThatEndShift" method="get">
             <input type="hidden" name="StartDate" value="@TempData["FilterStartDate"]" />
             <input type="hidden" name="EndDate" value="@TempData["FilterEndDate"]" />
@@ -141,6 +149,7 @@
         <form asp-action="Index" method="get">
             <button type="submit" class="small-btn">رجوع</button>
         </form>
+        
     </div>
 
     <form asp-action="GetAttendanceReport" method="get" class="form-inline-date">
