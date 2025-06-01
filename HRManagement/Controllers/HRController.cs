@@ -267,7 +267,7 @@ namespace HRManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateEmployee(EmployeeViewModel model,string branch)
         {
-            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(model.Id));
+            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(model.Id,model.Month,model.Year));
             if (employee == null)
             {
                 return RedirectToAction("GetAllEmployees", new { message = "الموظف غير موجود" , BranchName = branch });
@@ -279,10 +279,7 @@ namespace HRManagement.Controllers
             employee.BankName = model.BankName;
             employee.BankAccount = model.BankAccount;
 
-            var monthlyData = employee.MonthlyData
-                        .OrderByDescending(md => md.Year)
-                        .ThenByDescending(md => md.Month)
-                        .FirstOrDefault(md => md.Month == model.Month && md.Year == model.Year);
+            var monthlyData = employee.MonthlyData.Where(md => md.Month == model.Month && md.Year == model.Year).FirstOrDefault();
 
             if (monthlyData != null)
             {
@@ -322,7 +319,7 @@ namespace HRManagement.Controllers
 
             if (result > 0)
             {
-                return RedirectToAction("GetAllEmployees",new { message = "تم التعديل بنجاح", BranchName = employee.BranchName});
+                return RedirectToAction("GetAllEmployees",new { message = "تم التعديل بنجاح", BranchName = employee.BranchName , month = model.Month , year = model.Year});
             }
 
             return View(model);
