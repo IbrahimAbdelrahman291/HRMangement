@@ -98,7 +98,7 @@
         </form>
 
         <div style="text-align: center;">
-            <a asp-action="GetAllBorrows" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" asp-route-branch="@TempData["FilterBranch"]" class="back-btn">رجوع</a>
+            <a asp-action="GetAllBorrows" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" asp-route-branch="@TempData["FilterBranch"]" asp-route-monthlyEmployeeDataId="@TempData["MonthlyEmployeeDataId"]" class="back-btn">رجوع</a>
         </div>
     </div>
 </body>

@@ -51,7 +51,7 @@ namespace BLL.Repositories
                                 Month = egyptDate.Month,
                                 Year = egyptDate.Year,
                                 TotalSalary = EmpData.TotalSalary,
-                                Holidaies = EmpData.Holidaies,
+                                Holidaies = (EmpData.Year < egyptDate.Year) ? 7 : EmpData.Holidaies ,
                                 Target = EmpData.Target,
                                 
                             };
@@ -65,7 +65,7 @@ namespace BLL.Repositories
                                 Month = egyptDate.Month,
                                 Year = egyptDate.Year,
                                 SalaryPerHour = EmpData.SalaryPerHour,
-                                Holidaies = EmpData.Holidaies,
+                                Holidaies = (EmpData.Year < egyptDate.Year) ? 7 : EmpData.Holidaies,
                                 TotalSalary = 0.0,
                                 Target = EmpData.Target,
                                 
