@@ -1,0 +1,224 @@
+﻿@model IEnumerable<WorkLogsViewModel>
+@{
+    ViewData["Title"] = "GetAttendanceReport";
+    var Branches = TempData["Branches"];
+    TempData.Keep("FilterStartDate");
+    TempData.Keep("FilterEndDate");
+    TempData.Keep("EmployeeId");
+    TempData.Keep("EmployeeName");
+    TempData.Keep("BranchName");
+    TempData.Keep("Branches");
+}
+<html lang="ar">
+<head>
+    <meta charset="utf-8" />
+    <title>تقرير الحضور</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            direction: rtl;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .small-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+
+            .small-btn:hover {
+                background-color: #0056b3;
+            }
+
+        .export-button {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+
+            .export-button:hover {
+                background-color: #059669;
+            }
+
+        .form-inline-date {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+            .form-inline-date input[type="date"],
+            .form-inline-date input[type="text"],
+            .form-inline-date select {
+                padding: 5px;
+                font-size: 14px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+            }
+
+        .filter-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+
+            .filter-btn:hover {
+                background-color: #0056b3;
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script>
+        function exportTableToExcel() {
+            var wb = XLSX.utils.table_to_book(document.querySelector("table"), { sheet: "AttendanceReport" });
+            XLSX.writeFile(wb, "AttendanceReport.xlsx");
+        }
+    </script>
+</head>
+<body>
+    <h2>تقرير الحضور</h2>
+
+    <div class="action-buttons">
+        <form asp-action="EmployeeThatDoesntStartShift" method="get">
+            <input type="hidden" name="StartDate" value="@TempData["FilterStartDate"]" />
+            <input type="hidden" name="EndDate" value="@TempData["FilterEndDate"]" />
+            <input type="hidden" name="EmployeeId" value="@TempData["EmployeeId"]" />
+            <input type="hidden" name="EmployeeName" value="@TempData["EmployeeName"]" />
+            <input type="hidden" name="BranchName" value="@TempData["BranchName"]" />
+            <button type="submit" class="small-btn">موظفين لم يحضروا</button>
+        </form>
+        <form asp-action="GetForgetedAttendeeThatEndShift" method="get">
+            <input type="hidden" name="StartDate" value="@TempData["FilterStartDate"]" />
+            <input type="hidden" name="EndDate" value="@TempData["FilterEndDate"]" />
+            <input type="hidden" name="EmployeeId" value="@TempData["EmployeeId"]" />
+            <input type="hidden" name="EmployeeName" value="@TempData["EmployeeName"]" />
+            <input type="hidden" name="BranchName" value="@TempData["BranchName"]" />
+
+            <button type="submit" class="small-btn">الشيفتات المنسية</button>
+        </form>
+        <button class="export-button" onclick="exportTableToExcel()">تصدير إلى Excel</button>
+        <form asp-action="Index" method="get">
+            <button type="submit" class="small-btn">رجوع</button>
+        </form>
+
+    </div>
+
+    <form asp-action="GetAttendanceReport" method="get" class="form-inline-date">
+        <div>
+            <label for="StartDate">من تاريخ:</label>
+            <input type="date" name="StartDate" class="form-control" />
+        </div>
+        <div>
+            <label for="EndDate">إلى تاريخ:</label>
+            <input type="date" name="EndDate" class="form-control" />
+        </div>
+        <div>
+            <input type="number" name="EmployeeId" class="form-control" placeholder="بحث بـ ID الموظف" />
+        </div>
+        <div>
+            <input type="text" name="EmployeeName" class="form-control" placeholder="بحث باسم الموظف" />
+        </div>
+        <div>
+            <select name="BranchName" class="form-control">
+                <option value="">اختر اسم الفرع</option>
+                @if (Branches is List<string> branchList)
+                {
+                    foreach (var branch in branchList)
+                    {
+                        <option value="@branch">@branch</option>
+                    }
+                }
+            </select>
+        </div>
+        <div>
+            <button type="submit" class="filter-btn">تطبيق الفلتر</button>
+        </div>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>الرقم التعريفي</th>
+                <th>اسم الموظف</th>
+                <th>الفرع</th>
+                <th>التاريخ</th>
+                <th>البداية</th>
+                <th>النهاية</th>
+                <th>المدة</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.EmployeeId</td>
+                        <td>@item.EmployeeName</td>
+                        <td>@item.BranchName</td>
+                        <td>@item.Day</td>
+                        <td>@item.Start</td>
+                        <td>@item.End</td>
+                        <td>@item.TotalTime</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="7">لا توجد بيانات لعرضها</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

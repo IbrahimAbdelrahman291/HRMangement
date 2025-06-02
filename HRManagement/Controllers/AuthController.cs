@@ -62,6 +62,10 @@ namespace HRManagement.Controllers
             {
                 return RedirectToAction("Index", "BranchManager");
             }
+            else if (await _userManager.IsInRoleAsync(user, "Control"))
+            {
+                return RedirectToAction("Index", "Control");
+            }
 
             return RedirectToAction("Index", new { message = "هناك خطأ في كلمه المرور او اسم المستخدم" });
         }

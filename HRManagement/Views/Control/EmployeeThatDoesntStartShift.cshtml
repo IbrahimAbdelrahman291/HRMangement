@@ -1,0 +1,147 @@
+﻿@model List<Employee>
+@{
+    ViewData["Title"] = "EmployeeThatDoesntStartShift";
+    TempData.Keep("FilterStartDate");
+    TempData.Keep("FilterEndDate");
+    TempData.Keep("EmployeeId");
+    TempData.Keep("EmployeeName");
+    TempData.Keep("BranchName");
+}
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+    <title>Employees That Didn't Start Shift</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+            background-color: #f9f9f9;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 900px;
+            margin: auto;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f6fc;
+        }
+
+        tr:hover {
+            background-color: #dbe9ff;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .export-button {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+
+            .export-button:hover {
+                background-color: #059669;
+            }
+
+        .small-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            font-size: 14px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+            white-space: nowrap;
+        }
+
+            .small-btn:hover {
+                background-color: #0056b3;
+            }
+    </style>
+    <script>
+        function exportTableToExcel() {
+            var wb = XLSX.utils.table_to_book(document.querySelector("table"), { sheet: "AttendanceReport" });
+            XLSX.writeFile(wb, "AttendanceReport.xlsx");
+        }
+    </script>
+</head>
+<body>
+    <h2>الموظفين الذين لم يسجلوا اليوم</h2>
+
+    <div class="action-buttons">
+
+        <button class="export-button" onclick="exportTableToExcel()">تصدير إلى Excel</button>
+        <form asp-action="GetAttendanceReport" method="get">
+            <input type="hidden" name="StartDate" value="@TempData["FilterStartDate"]" />
+            <input type="hidden" name="EndDate" value="@TempData["FilterEndDate"]" />
+            <input type="hidden" name="EmployeeId" value="@TempData["EmployeeId"]" />
+            <input type="hidden" name="EmployeeName" value="@TempData["EmployeeName"]" />
+            <input type="hidden" name="BranchName" value="@TempData["BranchName"]" />
+            <button type="submit" class="small-btn">رجوع</button>
+        </form>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>الرقم التعريفي</th>
+                <th>الاسم</th>
+                <th>الفرع</th>
+                <th>الدور</th>
+                <th>التاريخ</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var employee in Model)
+            {
+                <tr>
+                    <td>@employee.Id</td>
+                    <td>@employee.Name</td>
+                    <td>@employee.BranchName</td>
+                    <td>@employee.Role</td>
+                    <td>@TempData["FilterStartDate"]</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</body>
+</html>

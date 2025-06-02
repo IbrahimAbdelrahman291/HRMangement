@@ -170,7 +170,92 @@ namespace HRManagement.Controllers
 
             return RedirectToAction("GetAllHR", new { message = "حدث خطأ غير معروف" });
         }
+        //control
+        [HttpGet]
+        public async Task<IActionResult> GetAllControl(string? message = null)
+        {
+            var hrUsers = await _userManager.GetUsersInRoleAsync("Control");
+            ViewBag.Message = message;
+            return View(hrUsers);
+        }
+        [HttpGet]
+        public IActionResult AddControl()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddControl(string userName, string password)
+        {
+            userName = userName.Trim().Replace(" ", "");
+            if (string.IsNullOrWhiteSpace(userName) || string.IsNullOrWhiteSpace(password))
+            {
+                return RedirectToAction("GetAllControl", new { message = "لم يتم اضافه اليوزر بنجاح قد يكون هناك مسافات او قيم فارغه" });
+            }
 
+            if (!await _roleManager.RoleExistsAsync("Control"))
+            {
+                var roleResult = await _roleManager.CreateAsync(new IdentityRole("Control"));
+                if (!roleResult.Succeeded)
+                {
+                    return RedirectToAction("GetAllControl", new { message = "حدث خطأ في انشاء الدور" });
+                }
+            }
+
+            var existingUser = await _userManager.FindByNameAsync(userName);
+            if (existingUser != null)
+            {
+                return RedirectToAction("GetAllControl", new { message = "المستخدم موجود بالفعل" });
+            }
+
+            var user = new User
+            {
+                UserName = userName
+            };
+
+            var result = await _userManager.CreateAsync(user, password);
+            if (!result.Succeeded)
+            {
+                return RedirectToAction("GetAllControl", new { message = "حدث خطأ في انشاء المستخدم" });
+            }
+
+            var createdUser = await _userManager.FindByNameAsync(user.UserName);
+            if (createdUser == null)
+            {
+                return RedirectToAction("GetAllControl", new { message = "المستخدم المضاف تم فقضه ولم نستطع اضافه الدور له" });
+            }
+
+            var roleAssignResult = await _userManager.AddToRoleAsync(createdUser, "Control");
+            if (!roleAssignResult.Succeeded)
+            {
+                return RedirectToAction("GetAllControl", new { message = "لم نستطع اضافه المستخدم للدور المنسوب اليه" });
+            }
+
+            return RedirectToAction("GetAllControl", new { message = "تم اضافه المستخدم وادواره بنجاح" });
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteControl(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return RedirectToAction("GetAllControl", new { message = "لم يتم العثور على المستخدم" });
+            }
+
+            var isControl = await _userManager.IsInRoleAsync(user, "Control");
+            if (!isControl)
+            {
+                return RedirectToAction("GetAllControl", new { message = "هذا المستخدم دوره ليس Control" });
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                return RedirectToAction("GetAllControl", new { message = "تم مسح المستخدم بنجاح" });
+            }
+
+            return RedirectToAction("GetAllControl", new { message = "حدث خطأ غير معروف" });
+        }
+        //
         [HttpGet]
         public async Task<IActionResult> GetAllAccountant(string? message =null ) 
         {

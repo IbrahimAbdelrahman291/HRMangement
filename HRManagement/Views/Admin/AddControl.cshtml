@@ -1,0 +1,110 @@
+﻿@{
+    ViewData["Title"] = "AddControl";
+}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة مراقب</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+            }
+
+        .btn-secondary {
+            background-color: #007bff;
+            color: white;
+            display: inline-block;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+            .btn-secondary:hover {
+                background-color: #0056b3;
+            }
+
+        a {
+            text-decoration: none;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+            .back-btn:hover {
+                background: #0056b3;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>إضافة مراقب</h1>
+        <form asp-action="AddControl" method="post">
+            <input type="text" name="userName" placeholder="اسم المستخدم" required />
+            <input type="password" name="password" placeholder="كلمة المرور" required />
+            <button type="submit" class="btn btn-primary">إضافة مراقب</button>
+        </form>
+        <a asp-action="GetAllControl" class="back-btn">رجوع</a>
+    </div>
+</body>
+</html>
