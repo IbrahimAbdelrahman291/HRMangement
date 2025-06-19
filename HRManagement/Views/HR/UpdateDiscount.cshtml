@@ -1,0 +1,106 @@
+﻿@model DiscountViewModel
+@{
+    ViewData["Title"] = "UpdateDiscount";
+    TempData.Keep("FilterMonth");
+    TempData.Keep("FilterYear");
+    TempData.Keep("FilterBranch");
+    TempData.Keep("MonthlyEmployeeDataId");
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تعديل خصم</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .container {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            width: 80%;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, textarea, button {
+            padding: 10px;
+            margin-bottom: 15px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            button:hover {
+                background-color: #0056b3;
+            }
+
+        .back-btn {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+            .back-btn:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>تعديل خصم</h1>
+        <form asp-action="UpdateDiscount" method="post">
+            <input type="hidden" asp-for="MonthlyEmployeeDataId" value="@TempData["MonthlyEmployeeDataId"]" />
+            <input type="hidden" name="id" value="@Model.Id" />
+            <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
+            <input type="hidden" name="year" value="@TempData["FilterYear"]" />
+            <input type="hidden" name="branch" value="@TempData["FilterBranch"]" />
+
+            <label for="Amount">المبلغ</label>
+            <input asp-for="Amount" type="number" placeholder="المبلغ" required />
+
+            <label for="ReasonOfDiscount">سبب الخصم</label>
+            <textarea asp-for="ReasonOfDiscount" rows="4" required></textarea>
+
+            <label for="Notes">الملاحظات</label>
+            <textarea asp-for="Notes" rows="2"></textarea>
+
+            <label for="Date">التاريخ</label>
+            <input asp-for="Date" type="date" required />
+
+            <button type="submit">تعديل</button>
+        </form>
+        <div style="text-align: center;">
+            <a asp-action="GetAllDiscounts" asp-route-month="@TempData["FilterMonth"]" asp-route-year="@TempData["FilterYear"]" asp-route-branch="@TempData["FilterBranch"]" asp-route-monthlyEmployeeDataId="@TempData["MonthlyEmployeeDataId"]" class="back-btn">رجوع</a>
+        </div>
+    </div>
+</body>
+</html>

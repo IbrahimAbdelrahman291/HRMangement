@@ -55,6 +55,7 @@ namespace HRManagement.Controllers
 
             var AllAttendee = await _worklogsRepo.GetAllWithSpecAsync(new WorkLogsSpec(StartDate, EndDate, EmployeeId, EmployeeName, BranchName));
             AllAttendee = AllAttendee.OrderBy(e => e.Day);
+            AllAttendee = AllAttendee.OrderBy(e => e.Start);
             var MappedAttendee = _mapper.Map<IEnumerable<WorkLogsViewModel>>(AllAttendee);
             var uniqueBranchNames = _dbContext.WorkLogs
                 .Where(e => !string.IsNullOrEmpty(e.Employee.BranchName)).Select(s => s.Employee.BranchName)

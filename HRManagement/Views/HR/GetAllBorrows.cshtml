@@ -119,7 +119,8 @@
                     <th>المبلغ</th>
                     <th>السبب</th>
                     <th>ملاحظات</th>
-                    <th>إجراء</th>
+                    <th>حذف</th>
+                    <th>تعديل</th>
                 </tr>
             </thead>
             <tbody>
@@ -138,6 +139,16 @@
                                 <input type="hidden" name="year" value="@TempData["FilterYear"]" />
                                 <input type="hidden" name="branch" value="@TempData["FilterBranch"]" />
                                 <button type="submit" class="btn btn-danger">حذف</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form asp-action="UpdateBorrow" method="get">
+                                <input type="hidden" name="borrowId" value="@borrow.Id" />
+                                <input type="hidden" name="monthlyEmployeeDataId" value="@TempData["MonthlyEmployeeDataId"]" />
+                                <input type="hidden" name="month" value="@TempData["FilterMonth"]" />
+                                <input type="hidden" name="year" value="@TempData["FilterYear"]" />
+                                <input type="hidden" name="branch" value="@TempData["FilterBranch"]" />
+                                <button type="submit" class="btn btn-danger">تعديل</button>
                             </form>
                         </td>
                     </tr>

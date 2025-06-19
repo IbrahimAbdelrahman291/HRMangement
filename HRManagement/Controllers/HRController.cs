@@ -526,6 +526,64 @@ namespace HRManagement.Controllers
             }
             return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = MonthlyDataId , month = month , year = year , branch = branch });
         }
+        [HttpGet]
+        public async Task<IActionResult> UpdateDiscount(int discountId, int monthlyEmployeeDataId, int month, int year, string branch)
+        {
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData["FilterBranch"] = branch;
+            TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
+            TempData.Keep("FilterBranch");
+            TempData.Keep("MonthlyEmployeeDataId");
+            var discount = await _context.Discounts.Where(d => d.Id == discountId).FirstOrDefaultAsync();
+            if (discount == null)
+            {
+                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = monthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+            var mappedDiscount = _mapper.Map<DiscountViewModel>(discount);
+            return View(mappedDiscount);
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateDiscount(DiscountViewModel model,int id, int monthlyEmployeeDataId, int month, int year, string branch)
+        {
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData["FilterBranch"] = branch;
+            TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
+            TempData.Keep("FilterBranch");
+            TempData.Keep("MonthlyEmployeeDataId");
+            
+            var monthlyData = await _context.MonthlyEmployeeData
+                .FirstOrDefaultAsync(m => m.Id == model.MonthlyEmployeeDataId);
+            if (monthlyData == null)
+            {
+                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+
+            var discount = await _context.Discounts.FindAsync(id);
+            if (discount == null)
+            {
+                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+
+            discount.Amount = model.Amount;
+            discount.ReasonOfDiscount = model.ReasonOfDiscount;
+            discount.Notes = model.Notes ?? "";
+            discount.Date = model.Date;
+
+            _context.Discounts.Update(discount);
+            int result = await _context.SaveChangesAsync();
+            if (result > 0)
+            {
+                return RedirectToAction("GetAllDiscounts", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+
+            return View(model);
+        }
         [HttpPost]
         public async Task<IActionResult> DeleteBorrow(int borrowId, int month, int year, string branch)
         {
@@ -551,6 +609,64 @@ namespace HRManagement.Controllers
             }
 
             return RedirectToAction("GetAllBorrows", new { monthlyEmployeeDataId = MonthlyDataId , month = month , year = year , branch = branch });
+        }
+        [HttpGet]
+        public async Task<IActionResult> UpdateBorrow(int borrowId, int monthlyEmployeeDataId, int month, int year, string branch)
+        {
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData["FilterBranch"] = branch;
+            TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
+            TempData.Keep("FilterBranch");
+            TempData.Keep("MonthlyEmployeeDataId");
+            var borrow = await _context.Borrows.Where(d => d.Id == borrowId).FirstOrDefaultAsync();
+            if (borrow == null)
+            {
+                return RedirectToAction("GetAllBorrows", new { monthlyEmployeeDataId = monthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+            var mappedBorrow = _mapper.Map<BorrowViewModel>(borrow);
+            return View(mappedBorrow);
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateBorrow(BorrowViewModel model, int id, int monthlyEmployeeDataId, int month, int year, string branch)
+        {
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData["FilterBranch"] = branch;
+            TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
+            TempData.Keep("FilterBranch");
+            TempData.Keep("MonthlyEmployeeDataId");
+
+            var monthlyData = await _context.MonthlyEmployeeData
+                .FirstOrDefaultAsync(m => m.Id == model.MonthlyEmployeeDataId);
+            if (monthlyData == null)
+            {
+                return RedirectToAction("GetAllBorrows", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+
+            var borrow = await _context.Borrows.FindAsync(id);
+            if (borrow == null)
+            {
+                return RedirectToAction("GetAllBorrows", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+
+            borrow.Amount = model.Amount;
+            borrow.Reason = model.Reason;
+            borrow.Notes = model.Notes ?? "";
+            borrow.DateOfBorrow = model.DateOfBorrow;
+
+            _context.Borrows.Update(borrow);
+            int result = await _context.SaveChangesAsync();
+            if (result > 0)
+            {
+                return RedirectToAction("GetAllBorrows", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+
+            return View(model);
         }
         [HttpPost]
         public async Task<IActionResult> DeleteBouns(int bonusId, int month, int year, string branch)
@@ -578,6 +694,64 @@ namespace HRManagement.Controllers
             }
 
             return RedirectToAction("GetAllBouns", new { monthlyEmployeeDataId = MonthlyDataId, month = month, year = year , branch = branch});
+        }
+        [HttpGet]
+        public async Task<IActionResult> UpdateBouns(int bonusId, int monthlyEmployeeDataId, int month, int year, string branch)
+        {
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData["FilterBranch"] = branch;
+            TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
+            TempData.Keep("FilterBranch");
+            TempData.Keep("MonthlyEmployeeDataId");
+            var bouns = await _context.Bounss.Where(d => d.Id == bonusId).FirstOrDefaultAsync();
+            if (bouns == null)
+            {
+                return RedirectToAction("GetAllBouns", new { monthlyEmployeeDataId = monthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+            var mappedBouns = _mapper.Map<BounsViewModel>(bouns);
+            return View(mappedBouns);
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateBouns(BounsViewModel model, int id, int monthlyEmployeeDataId, int month, int year, string branch) 
+        {
+            TempData["FilterMonth"] = month;
+            TempData["FilterYear"] = year;
+            TempData["FilterBranch"] = branch;
+            TempData["MonthlyEmployeeDataId"] = monthlyEmployeeDataId;
+            TempData.Keep("FilterMonth");
+            TempData.Keep("FilterYear");
+            TempData.Keep("FilterBranch");
+            TempData.Keep("MonthlyEmployeeDataId");
+
+            var monthlyData = await _context.MonthlyEmployeeData
+                .FirstOrDefaultAsync(m => m.Id == model.MonthlyEmployeeDataId);
+            if (monthlyData == null)
+            {
+                return RedirectToAction("GetAllBouns", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+
+            var bouns = await _context.Bounss.FindAsync(id);
+            if (bouns == null)
+            {
+                return RedirectToAction("GetAllBouns", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+
+            bouns.Amount = model.Amount;
+            bouns.Reason = model.Reason;
+            bouns.Notes = model.Notes ?? "";
+            bouns.DateOfBouns = model.DateOfBouns;
+
+            _context.Bounss.Update(bouns);
+            int result = await _context.SaveChangesAsync();
+            if (result > 0)
+            {
+                return RedirectToAction("GetAllBouns", new { monthlyEmployeeDataId = model.MonthlyEmployeeDataId, month = month, year = year, branch = branch });
+            }
+
+            return View(model);
         }
         [HttpGet]
         public IActionResult AddDiscount(int monthlyEmployeeDataId,int month,int year, string branch)
