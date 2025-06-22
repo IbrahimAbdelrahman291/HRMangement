@@ -355,7 +355,7 @@ namespace HRManagement.Controllers
         public IActionResult ApproveRequest(int Id)
         {
             var holidayRequest = _context.HolidayRequests.Where(h => h.Id == Id)
-                .Include(hr => hr.Employee);
+                .Include(hr => hr.Employee).FirstOrDefault();
 
 
             if (holidayRequest == null)
