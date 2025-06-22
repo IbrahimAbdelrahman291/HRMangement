@@ -16,6 +16,7 @@ namespace HRManagement.Helper
                 .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.BankName))
                 .ForMember(dest => dest.BankAccount, opt => opt.MapFrom(src => src.BankAccount))
                 .ForMember(dest => dest.Target, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().Target))
+                .ForMember(dest => dest.Insurence, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().Insurence))
                 .ForMember(dest => dest.TotalBonuss, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().TotalBouns))
                 .ForMember(dest => dest.TotalBorrows, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().TotalBorrows))
                 .ForMember(dest => dest.TotalDiscounts, opt => opt.MapFrom(src => src.MonthlyData.FirstOrDefault().TotalDiscounts))

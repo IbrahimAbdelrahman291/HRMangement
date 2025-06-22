@@ -190,31 +190,34 @@ namespace HRManagement.Controllers
                 if (employee?.Role.ToLower() == "static")
                 {
                     employee.NetSalary = (employee.TotalSalary + totalBounss)
-                    - (totalBorrows + (double)totalDiscounts );
+                    - (totalBorrows + (double)totalDiscounts + employee.Insurence ?? 0);
 
                 }
                 else if (employee?.Role.ToLower() == "changable")
                 {
                     employee.NetSalary = ((((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0)+ (employee.ForgetedHours??0)) * employee.SalaryPerHour / 26)
-                    + totalBounss) - (totalBorrows + (double)totalDiscounts);
+                    + totalBounss) - (totalBorrows + (double)totalDiscounts + employee.Insurence ?? 0);
                     employee.TotalSalary = (((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0) + (employee.ForgetedHours ?? 0)) * employee.SalaryPerHour) / 26;
                 }
                 else if (employee?.Role.ToLower() == "delivery")
                 {
                     employee.NetSalary = ((((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0) + (employee.ForgetedHours??0)) * employee.SalaryPerHour)
-                    + totalBounss) - (totalBorrows + (double)totalDiscounts);
+                    + totalBounss) - (totalBorrows + (double)totalDiscounts + employee.Insurence ?? 0);
                     employee.TotalSalary = ((employee.Hours ?? 0) + (employee.HoursOverTime ?? 0) + (employee.ForgetedHours??0))  * employee.SalaryPerHour;
 
                 }
-                if (employee.Holidaies == null)
+                if (employee?.Holidaies == null)
                 {
-                    employee.Holidaies = 7;
+                    employee!.Holidaies = 7;
                 }
-                if (employee.Target == null || employee.Target == 0)
+                if (employee?.Target == null || employee.Target == 0)
                 {
-                    employee.Target = 8*26;
+                    employee!.Target = 8*26;
                 }
-
+                if (employee?.Insurence == null)
+                {
+                    employee!.Insurence = 255;
+                }
                 var monthlyData = await _context.MonthlyEmployeeData
                     .FirstOrDefaultAsync(m => m.EmployeeId == employee.Id && m.Month == currentMonth && m.Year == currentYear);
                 
@@ -227,6 +230,7 @@ namespace HRManagement.Controllers
                     monthlyData.TotalDiscounts = employee.TotalDiscounts;
                     monthlyData.TotalBorrows = employee.TotalBorrows;
                     monthlyData.TotalBouns = employee.TotalBonuss;
+                    monthlyData.Insurence = employee.Insurence;
                     _context.MonthlyEmployeeData.Update(monthlyData);
                 }
             }
@@ -348,11 +352,10 @@ namespace HRManagement.Controllers
             return View(MappedRequests);
         }
         [HttpGet]
-        public async Task<IActionResult> ApproveRequest(int id)
+        public IActionResult ApproveRequest(int Id)
         {
-            var holidayRequest = await _context.HolidayRequests
-                .Include(hr => hr.Employee)
-                .FirstOrDefaultAsync(hr => hr.Id == id);
+            var holidayRequest = _context.HolidayRequests.Where(h => h.Id == Id)
+                .Include(hr => hr.Employee);
 
 
             if (holidayRequest == null)
@@ -374,11 +377,14 @@ namespace HRManagement.Controllers
                 {
                     return RedirectToAction("GetAllHolidaysRequests", new { message = "الموظف غير موجود يبدو ان حدث خطأ" });
                 }
+                var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+                var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
 
-                var temp = employee.MonthlyData
-                                  .OrderByDescending(m => m.Year)
-                                  .ThenByDescending(m => m.Month)
-                                  .FirstOrDefault(); 
+                var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+                var month = egyptDate.Month;
+                var year = egyptDate.Year;
+
+                var temp = employee.MonthlyData.Where(m => m.Month == month && m.Year == year).FirstOrDefault();
                 if (temp != null)
                 {
                     if (temp.Holidaies > 0 || temp.Holidaies==null)
@@ -393,6 +399,7 @@ namespace HRManagement.Controllers
                             temp.Holidaies -= 1;
                         }
                         _empRepo.Update(employee);
+                        _monthlyEmpRepo.Update(temp);
                     }
                     else
                     {
@@ -407,9 +414,10 @@ namespace HRManagement.Controllers
                 }
 
                 request.status = "مقبول";
+                request.HolidayDate = model.HolidayDate;
                 _context.HolidayRequests.Update(request);
 
-                int Result = await _empRepo.CompleteAsync();
+                int Result = await _dbContext.SaveChangesAsync();
                 if (Result > 0)
                 {
                     return RedirectToAction("GetAllHolidaysRequests", new { message = "تم الموافقة على الطلب" });
