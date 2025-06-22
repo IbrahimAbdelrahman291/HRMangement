@@ -293,7 +293,7 @@ namespace HRManagement.Controllers
                 monthlyData.SalaryPerHour = model.SalaryPerHour;
                 monthlyData.TotalSalary = model.TotalSalary;
                 monthlyData.Holidaies = model.Holidaies;
-
+                monthlyData.Insurence = model.Insurence;
                 var totalDiscounts = employee.MonthlyData
                     .Where(md => md.Id == monthlyData.Id)
                     .SelectMany(md => md.Discounts)
