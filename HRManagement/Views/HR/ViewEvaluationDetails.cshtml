@@ -1,0 +1,132 @@
+﻿@model QuarterlyEvaluationViewModel
+@{
+    ViewData["Title"] = "عرض التقرير";
+    TempData.Keep("EmployeeId");
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma;
+            background-color: #f7f7f7;
+            direction: rtl;
+            padding: 30px;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #444;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: right;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        select, input {
+            background-color: #e9ecef;
+            border: none;
+            pointer-events: none;
+            /* دي عشان تمنع التعديل */
+            color: #495057;
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+        }
+
+        .btn-container {
+            display: flex;
+            justify-content: flex-start;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            color: white;
+            text-decoration: none;
+            background-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>تقرير الموظف - @Model.EmployeeName</h2>
+        <p><strong>الربع:</strong> @Model.Quarter</p>
+        <p><strong>المُقيّم:</strong> @Model.EvaluatedBy</p>
+
+        <form>
+            <input type="hidden" asp-for="EmployeeId" />
+            <input type="hidden" asp-for="Quarter" />
+            <input type="hidden" asp-for="EvaluatedBy" />
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>البند</th>
+                        <th>التقييم</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.EvaluationResults.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                @Model.EvaluationResults[i].CriteriaName
+                                <input type="hidden" asp-for="EvaluationResults[@i].EvaluationCriteriaId" />
+                                <input type="hidden" asp-for="EvaluationResults[@i].CriteriaName" />
+                            </td>
+                            <td>
+                                <select name="EvaluationResults[@i].Rating" class="form-control" disabled>
+                                    @{
+                                        var currentRating = Model.EvaluationResults[i].Rating;
+                                    }
+                                    <option value="ممتاز" selected="@(currentRating == "ممتاز" ? "selected" : null)">ممتاز</option>
+                                    <option value="جيد" selected="@(currentRating == "جيد" ? "selected" : null)">جيد</option>
+                                    <option value="ضعيف" selected="@(currentRating == "ضعيف" ? "selected" : null)">ضعيف</option>
+                                </select>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="btn-container">
+                <a asp-action="GetAllEvaluationsByEmployeeId"
+                   asp-route-employeeId="@TempData["EmployeeId"]"
+                   class="btn">رجوع</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

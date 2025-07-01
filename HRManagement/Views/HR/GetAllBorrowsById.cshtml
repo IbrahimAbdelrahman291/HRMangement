@@ -1,0 +1,93 @@
+﻿@model IEnumerable<BorrowViewModel>
+@{
+    ViewData["Title"] = "GetAllBorrowsById";
+    TempData.Keep("EmployeeId");
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma;
+            background-color: #f4f4f4;
+            direction: rtl;
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 80%;
+            margin: auto;
+            border-collapse: collapse;
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: right;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        .btn-back {
+            display: block;
+            width: fit-content;
+            margin: 20px auto;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+            .btn-back:hover {
+                background-color: #5a6268;
+            }
+    </style>
+</head>
+<body>
+
+    <h1>السُلف</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>المبلغ</th>
+                <th>السبب</th>
+                <th>تاريخ السلفة</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Amount</td>
+                    <td>@item.Reason</td>
+                    <td>@item.DateOfBorrow</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a asp-action="GetEmployeeHistoryById" asp-route-id="@TempData["EmployeeId"]" class="btn-back">رجوع</a>
+
+</body>
+</html>

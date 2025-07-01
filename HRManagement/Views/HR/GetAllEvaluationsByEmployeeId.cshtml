@@ -1,0 +1,112 @@
+﻿@model List<QuarterlyEvaluation>
+@{
+    ViewData["Title"] = "عرض تقارير الموظف";
+    TempData.Keep("EmployeeId");
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma;
+            background-color: #f7f7f7;
+            direction: rtl;
+            padding: 30px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #444;
+        }
+
+        .top-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .btn-back {
+            background-color: #6c757d;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-view {
+            background-color: #17a2b8;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>قائمة تقارير الموظف</h2>
+
+    <div class="top-buttons">
+        <a class="btn btn-back" asp-action="GetEmployeeHistoryById" asp-route-id="@TempData["EmployeeId"]">رجوع</a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>رقم التقرير</th>
+                <th>اسم التقرير</th>
+                <th>بواسطه</th>
+                <th>الإجراء</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model != null && Model.Any())
+            {
+                foreach (var eval in Model)
+                {
+                    <tr>
+                        <td>@eval.Id</td>
+                        <td>@eval.Quarter</td>
+                        <td>@eval.EvaluatedBy</td>
+                        <td>
+                            <a class="btn btn-view" asp-action="ViewEvaluationDetails" asp-route-evaluationId="@eval.Id" asp-route-EmployeeId="@TempData["EmployeeId"]">عرض</a>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="3">لا توجد تقارير لهذا الموظف.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</body>
+</html>

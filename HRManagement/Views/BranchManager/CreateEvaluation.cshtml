@@ -1,0 +1,122 @@
+﻿@model QuarterlyEvaluationViewModel
+@{
+    ViewData["Title"] = "إنشاء تقييم";
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            direction: rtl;
+            background-color: #f0f0f0;
+            padding: 30px;
+        }
+
+        .form-container {
+            width: 70%;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .criteria-block {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .btn-save {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 16px;
+            margin-top: 20px;
+            display: inline-block;
+        }
+
+            .btn-back:hover {
+                background-color: #5a6268;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>تقييم الموظف - @Model.EmployeeName</h2>
+
+        <form asp-action="CreateEvaluation" method="post">
+            <input type="hidden" asp-for="EmployeeId" />
+
+            <label asp-for="Quarter">الربع</label>
+            <input asp-for="Quarter" type="text" placeholder="مثال: Q2 2025" required />
+
+            <label asp-for="EvaluatedBy">اسم المُقيِّم</label>
+            <input asp-for="EvaluatedBy" type="text" required />
+
+            <h3 style="margin-top:30px;">البنود</h3>
+
+            @for (int i = 0; i < Model.EvaluationResults.Count; i++)
+            {
+                <div class="criteria-block">
+                    <label>@Model.EvaluationResults[i].CriteriaName</label>
+
+                    <input type="hidden" name="EvaluationResults[@i].EvaluationCriteriaId" value="@Model.EvaluationResults[i].EvaluationCriteriaId" />
+                    <input type="hidden" name="EvaluationResults[@i].CriteriaName" value="@Model.EvaluationResults[i].CriteriaName" />
+
+                    <select name="EvaluationResults[@i].Rating" required>
+                        <option value="">-- اختر التقييم --</option>
+                        <option value="ممتاز">ممتاز</option>
+                        <option value="جيد">جيد</option>
+                        <option value="ضعيف">ضعيف</option>
+                    </select>
+                </div>
+            }
+
+            <button type="submit" class="btn-save">إنشاء التقييم</button>
+            <a asp-action="GetAllEvaluationsByEmployeeId" asp-route-employeeId="@Model.EmployeeId" class="btn-back">رجوع</a>
+        </form>
+    </div>
+
+</body>
+</html>

@@ -4,6 +4,7 @@ using DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(HRDbContext))]
-    partial class HRDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250624103023_add employee history")]
+    partial class addemployeehistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -202,31 +204,6 @@ namespace DAL.Migrations
                     b.ToTable("Employees");
                 });
 
-            modelBuilder.Entity("DAL.Models.EmployeeBranches", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("BranchName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("employeeBranches");
-                });
-
             modelBuilder.Entity("DAL.Models.EmployeeHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -242,6 +219,7 @@ namespace DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("EndOfServiceReason")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("GraduationYear")
@@ -259,49 +237,6 @@ namespace DAL.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("Histories");
-                });
-
-            modelBuilder.Entity("DAL.Models.EvaluationCriteria", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("evaluationCriterias");
-                });
-
-            modelBuilder.Entity("DAL.Models.EvaluationResult", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("EvaluationCriteriaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("QuarterlyEvaluationId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Rating")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EvaluationCriteriaId");
-
-                    b.HasIndex("QuarterlyEvaluationId");
-
-                    b.ToTable("evaluationResults");
                 });
 
             modelBuilder.Entity("DAL.Models.HolidayRequests", b =>
@@ -352,9 +287,6 @@ namespace DAL.Migrations
                     b.Property<int?>("Holidaies")
                         .HasColumnType("int");
 
-                    b.Property<double?>("HolidayHours")
-                        .HasColumnType("float");
-
                     b.Property<double?>("Hours")
                         .HasColumnType("float");
 
@@ -396,32 +328,6 @@ namespace DAL.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.ToTable("MonthlyEmployeeData");
-                });
-
-            modelBuilder.Entity("DAL.Models.QuarterlyEvaluation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("EvaluatedBy")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Quarter")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EmployeeId");
-
-                    b.ToTable("quarterlyEvaluations");
                 });
 
             modelBuilder.Entity("DAL.Models.RequestBorrow", b =>
@@ -793,17 +699,6 @@ namespace DAL.Migrations
                     b.Navigation("MonthlyEmployeeData");
                 });
 
-            modelBuilder.Entity("DAL.Models.EmployeeBranches", b =>
-                {
-                    b.HasOne("DAL.Models.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
             modelBuilder.Entity("DAL.Models.EmployeeHistory", b =>
                 {
                     b.HasOne("DAL.Models.Employee", "Employee")
@@ -813,25 +708,6 @@ namespace DAL.Migrations
                         .IsRequired();
 
                     b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("DAL.Models.EvaluationResult", b =>
-                {
-                    b.HasOne("DAL.Models.EvaluationCriteria", "EvaluationCriteria")
-                        .WithMany()
-                        .HasForeignKey("EvaluationCriteriaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DAL.Models.QuarterlyEvaluation", "QuarterlyEvaluation")
-                        .WithMany("EvaluationResults")
-                        .HasForeignKey("QuarterlyEvaluationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EvaluationCriteria");
-
-                    b.Navigation("QuarterlyEvaluation");
                 });
 
             modelBuilder.Entity("DAL.Models.HolidayRequests", b =>
@@ -849,17 +725,6 @@ namespace DAL.Migrations
                 {
                     b.HasOne("DAL.Models.Employee", "Employee")
                         .WithMany("MonthlyData")
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-                });
-
-            modelBuilder.Entity("DAL.Models.QuarterlyEvaluation", b =>
-                {
-                    b.HasOne("DAL.Models.Employee", "Employee")
-                        .WithMany()
                         .HasForeignKey("EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -982,11 +847,6 @@ namespace DAL.Migrations
                     b.Navigation("Bounss");
 
                     b.Navigation("Discounts");
-                });
-
-            modelBuilder.Entity("DAL.Models.QuarterlyEvaluation", b =>
-                {
-                    b.Navigation("EvaluationResults");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,90 @@
+﻿@model EvaluationCriteria
+@{
+    ViewData["Title"] = "AddCriteria";
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f9f9f9;
+            padding: 40px;
+            direction: rtl;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-container {
+            width: 50%;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            background-color: #007bff;
+        }
+
+        .btn-back {
+            background-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>إضافة بند تقييم</h1>
+
+    <div class="form-container">
+        <form asp-action="AddCriteria" method="post">
+            <div>
+                <label asp-for="Name">اسم البند:</label>
+                <input asp-for="Name" type="text" />
+            </div>
+
+            <div class="buttons">
+                <button type="submit" class="btn btn-submit">إضافة</button>
+                <a class="btn btn-back" asp-action="GetAllCriteria">رجوع</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

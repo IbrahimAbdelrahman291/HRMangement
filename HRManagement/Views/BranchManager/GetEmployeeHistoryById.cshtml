@@ -1,0 +1,181 @@
+﻿@model EmployeeHistoryViewModel
+@{
+    ViewData["Title"] = "عرض بيانات الموظف";
+    var branches = TempData["EmployeeBranches"] as List<EmployeeBranches>;
+    TempData.Keep("EmployeeId");
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma;
+            background-color: #f7f7f7;
+            direction: rtl;
+            padding: 30px;
+        }
+
+        .profile-container {
+            width: 70%;
+            margin: auto;
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #444;
+        }
+
+        .info-group {
+            margin-top: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            margin-top: 5px;
+        }
+
+            input[readonly], select[disabled] {
+                background-color: #eee;
+            }
+
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            text-align: right;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+            .action-buttons a {
+                padding: 10px 20px;
+                background-color: #17a2b8;
+                color: white;
+                text-decoration: none;
+                border-radius: 6px;
+                font-size: 16px;
+            }
+
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 16px;
+            margin-top: 30px;
+            display: inline-block;
+        }
+
+            .btn-back:hover {
+                background-color: #5a6268;
+            }
+
+        .back-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        <h2>الملف الوظيفي للموظف</h2>
+
+        <div class="info-group">
+            <label>اسم الموظف</label>
+            <input type="text" value="@Model.EmployeeName" readonly />
+
+            <label>تاريخ التعيين</label>
+            <input type="text" value="@Model.HiringDate.ToShortDateString()" readonly />
+
+            <label>المؤهل الدراسي</label>
+            <input type="text" value="@Model.Qualification" readonly />
+
+            <label>سنة التخرج</label>
+            <input type="text" value="@Model.GraduationYear" readonly />
+
+            <label>سبب إنهاء الخدمة</label>
+            <select disabled>
+                <option>@Model.EndOfServiceReason</option>
+            </select>
+
+            <label>تاريخ إنهاء الخدمة</label>
+            <input type="text" value="@(Model.EndOfServiceDate?.ToString("yyyy-MM-dd") ?? "")" readonly />
+        </div>
+
+        <h3 style="margin-top: 40px;">الفروع التي عمل بها</h3>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>اسم الفرع</th>
+                    <th>تاريخ البداية</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (branches != null && branches.Count > 0)
+                {
+                    foreach (var branch in branches)
+                    {
+                        <tr>
+                            <td>@branch.BranchName</td>
+                            <td>@branch.StartDate.ToString("yyyy-MM-dd")</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="2">لا توجد فروع مسجلة لهذا الموظف</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="action-buttons">
+            <a asp-action="GetAllDiscountsById" asp-route-EmployeeId="@TempData["EmployeeId"]">خصومات</a>
+            <a asp-action="GetAllBounsById" asp-route-EmployeeId="@TempData["EmployeeId"]">زيادات</a>
+            <a asp-action="GetAllBorrowsById" asp-route-EmployeeId="@TempData["EmployeeId"]">سلف</a>
+            <a asp-action="GetAllEvaluationsByEmployeeId" asp-route-EmployeeId="@TempData["EmployeeId"]">التقارير</a>
+        </div>
+
+        <div class="back-container">
+            <a asp-action="GetAllEmployeeHistories" class="btn-back">رجوع</a>
+        </div>
+    </div>
+
+</body>
+</html>

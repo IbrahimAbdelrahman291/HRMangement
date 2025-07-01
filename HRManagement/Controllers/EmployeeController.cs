@@ -82,14 +82,14 @@ namespace HRManagement.Controllers
             var egyptTime = TimeOnly.FromDateTime(egyptDateTime);
 
 
-            var existingWorkLog = await _context.WorkLogs
-                .FirstOrDefaultAsync(w => w.EmployeeId == employeeId && w.Day == egyptDate);
-            //مينفعش نمنعه يسجل تاني لو هو سجل امبارح وحاول يسجل تاني انهارده لان ممكن يكون شيفت صباحي ف يبقا كدا الناس بتاعت الشيفت المسائي هما اللي ياخدو بالهم وهما بنهمو الشيفت
-            if (existingWorkLog != null)
-            {
-                TempData.Keep("EmployeeId");
-                return RedirectToAction("Index", new { userId = userId, message = "تم تسجيل بداية العمل بالفعل لهذا اليوم." });
-            }
+            //var existingWorkLog = await _context.WorkLogs
+            //    .FirstOrDefaultAsync(w => w.EmployeeId == employeeId && w.Day == egyptDate);
+            ////مينفعش نمنعه يسجل تاني لو هو سجل امبارح وحاول يسجل تاني انهارده لان ممكن يكون شيفت صباحي ف يبقا كدا الناس بتاعت الشيفت المسائي هما اللي ياخدو بالهم وهما بنهمو الشيفت
+            //if (existingWorkLog != null)
+            //{
+            //    TempData.Keep("EmployeeId");
+            //    return RedirectToAction("Index", new { userId = userId, message = "تم تسجيل بداية العمل بالفعل لهذا اليوم." });
+            //}
 
             var newWorkLog = new WorkLogs
             {

@@ -67,10 +67,16 @@ namespace HRManagement
                 app.UseHsts();
             }
             app.UseHangfireDashboard();
+            var options = new RecurringJobOptions
+            {
+                TimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time")
+            };
+
             RecurringJob.AddOrUpdate<IMonthlyData>(
                 "start-new-month-job",
-                    service => service.NewMonthlyData(),
-                    "0 0 1 * *" // CRON expression: ??? 1 ?? ?? ???
+                service => service.NewMonthlyData(),
+                "0 0 1 * *",
+                options
             );
             app.UseHttpsRedirection();
             

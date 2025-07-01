@@ -33,6 +33,7 @@ namespace HRManagement.ViewModel
 
         public int Target { get; set; }
         public double? Insurence { get; set; }
+        public double? HolidayHours { get; set; }
         public double TotalBorrows { get; set; }
         public double TotalBonuss { get; set; }
         public double TotalDiscounts { get; set; }

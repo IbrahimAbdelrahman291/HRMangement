@@ -63,5 +63,11 @@ namespace DAL.Context
         public DbSet<RequestForForgetCloseShift> requests { get; set; }
         public DbSet<RequestBorrow> requestBorrows { get; set; }
         public DbSet<Complaints> Complaints { get; set; }
+        public DbSet<EmployeeHistory> Histories { get; set; }
+
+        public DbSet<EmployeeBranches> employeeBranches { get; set; }
+        public DbSet<EvaluationResult> evaluationResults { get; set; }
+        public DbSet<QuarterlyEvaluation> quarterlyEvaluations { get; set; }
+        public DbSet<EvaluationCriteria> evaluationCriterias { get; set; }
     }
 }

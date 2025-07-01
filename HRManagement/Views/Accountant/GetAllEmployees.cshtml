@@ -152,6 +152,8 @@
                     <th>التارجت</th>
                     <th>عدد ساعات العمل الإضافي</th>
                     <th>عدد الساعات المنسيه</th>
+                    <th>عدد ساعات الاجازات</th>
+                    <th>اجمالي الساعات</th>
                     <th>الاجازات</th>
                     <th>الراتب بالساعة</th>
                     <th>إجمالي الراتب</th>
@@ -178,6 +180,13 @@
                         <td>@employee.Target</td>
                         <td>@employee.HoursOverTime</td>
                         <td>@employee.ForgetedHours</td>
+                        <td>@employee.HolidayHours</td>
+                        <td>
+                            @{
+                                var totalHours = (employee.Hours ?? 0) + (employee.HoursOverTime ?? 0) + (employee.ForgetedHours ?? 0) + (employee.HolidayHours ?? 0);
+                            }
+                            @totalHours
+                        </td>
                         <td>@employee.Holidaies</td>
                         <td>@employee.SalaryPerHour</td>
                         <td>@employee.TotalSalary</td>

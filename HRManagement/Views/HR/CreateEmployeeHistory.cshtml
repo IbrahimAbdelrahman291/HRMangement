@@ -1,0 +1,105 @@
+﻿@model EmployeeHistoryViewModel
+@{
+    ViewData["Title"] = "CreateEmployeeHistory";
+    TempData.Keep("EmployeeId");
+}
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: Tahoma, sans-serif;
+            background-color: #f5f5f5;
+            direction: rtl;
+            padding: 30px;
+        }
+
+        .container {
+            width: 50%;
+            margin: auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn-container {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            color: white;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn-save {
+            background-color: #28a745;
+        }
+
+        .btn-back {
+            background-color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>إنشاء ملف موظف</h1>
+
+        <form asp-action="CreateEmployeeHistory" method="post">
+            <input type="hidden" name="EmployeeId" value="@TempData["EmployeeId"]" />
+            <label asp-for="HiringDate">تاريخ التعيين</label>
+            <input asp-for="HiringDate" value="defualt" type="date" />
+
+            <label asp-for="Qualification">المؤهل الدراسي</label>
+            <input asp-for="Qualification" type="text" />
+
+            <label asp-for="GraduationYear">سنة التخرج</label>
+            <input asp-for="GraduationYear" type="number" />
+
+            <label Name="BranchName">اسم الفرع</label>
+            <input type="text" name="BranchName"/>
+
+            <label Name="StartDate">تاريخ بدأ العمل في الفرع</label>
+            <input type="date" name="StartDate" />
+
+            <div class="btn-container">
+                <button type="submit" class="btn btn-save">حفظ</button>
+                <a asp-action="GetAllEmployeeHistories" class="btn btn-back">رجوع</a>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>

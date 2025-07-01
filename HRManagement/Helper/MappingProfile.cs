@@ -92,6 +92,29 @@ namespace HRManagement.Helper
 
             CreateMap<Complaints, ComplaintsViewModle>().ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name));
             CreateMap<ComplaintsViewModle, Complaints>().ForMember(dest => dest.Employee , opt => opt.Ignore());
+
+
+            CreateMap<EmployeeHistory, EmployeeHistoryViewModel>()
+                .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name));
+            CreateMap<EmployeeHistoryViewModel, EmployeeHistory>();
+
+
+            CreateMap<EmployeeBranches, EmployeeBranchesViewModel>()
+                .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name));
+
+            CreateMap<EmployeeBranchesViewModel, EmployeeBranches>();
+
+            CreateMap<EvaluationResult, EvaluationResultViewModel>()
+                .ForMember(dest => dest.CriteriaName, opt => opt.MapFrom(src => src.EvaluationCriteria.Name));
+
+            CreateMap<EvaluationResultViewModel, EvaluationResult>();
+
+            CreateMap<QuarterlyEvaluation, QuarterlyEvaluationViewModel>()
+                .ForMember(dest => dest.EmployeeName, opt => opt.MapFrom(src => src.Employee.Name))
+                .ForMember(dest => dest.EvaluationResults, opt => opt.MapFrom(src => src.EvaluationResults));
+
+            CreateMap<QuarterlyEvaluationViewModel, QuarterlyEvaluation>()
+                .ForMember(dest => dest.EvaluationResults, opt => opt.MapFrom(src => src.EvaluationResults));
         }
     }
 }

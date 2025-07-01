@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BLL.Interfaces;
 using BLL.Specification;
+using DAL.Context;
 using DAL.Models;
 using HRManagement.ViewModel;
 using Microsoft.AspNetCore.Authorization;
@@ -17,13 +18,15 @@ namespace HRManagement.Controllers
         private readonly IGenericRepository<Employee> _empRepo;
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly HRDbContext _dbContext;
 
-        public AdminController(IMapper mapper,IGenericRepository<Employee> EmpRepo,UserManager<User> userManager, RoleManager<IdentityRole> roleManager)
+        public AdminController(IMapper mapper,IGenericRepository<Employee> EmpRepo,UserManager<User> userManager, RoleManager<IdentityRole> roleManager,HRDbContext dbContext)
         {
             _mapper = mapper;
             _empRepo = EmpRepo;
             _userManager = userManager;
             _roleManager = roleManager;
+            _dbContext = dbContext;
         }
 
         public IActionResult Index()
@@ -478,6 +481,47 @@ namespace HRManagement.Controllers
             }
             return View(userName);
 
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllCriteria(string? message = null) 
+        {
+            ViewBag.Message = message;
+            try 
+            {
+                var criteria = await _dbContext.evaluationCriterias.ToListAsync();
+                if (criteria == null)
+                {
+                    criteria = new List<EvaluationCriteria>();
+                }
+                return View(criteria);
+            } 
+            catch 
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet]
+        public IActionResult AddCriteria()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddCriteria(EvaluationCriteria criteria)
+        {
+            try
+            {
+                  await _dbContext.evaluationCriterias.AddAsync(criteria);
+                  await _dbContext.SaveChangesAsync();
+                  return RedirectToAction("GetAllCriteria", new { message = "تم اضافه البند بنجاح" });
+            }
+            catch (Exception ex)
+            {
+                  return RedirectToAction("GetAllCriteria", new { message = "حدث خطأ اثناء اضافه بند جديد" });
+            }
+            
         }
     }
 }

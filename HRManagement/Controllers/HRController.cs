@@ -393,10 +393,12 @@ namespace HRManagement.Controllers
                         {
                             temp.Holidaies = 7;
                             temp.Holidaies -= 1;
+                            temp.HolidayHours = temp.HolidayHours == null ? 0 + 8 : temp.HolidayHours + 8;
                         }
                         else
                         {
                             temp.Holidaies -= 1;
+                            temp.HolidayHours = temp.HolidayHours == null ? 0 + 8 : temp.HolidayHours + 8;
                         }
                         _empRepo.Update(employee);
                         _monthlyEmpRepo.Update(temp);
@@ -1408,6 +1410,262 @@ namespace HRManagement.Controllers
                 }
             }
             return View(model);
+        }
+        
+        //CV
+        [HttpGet]
+        public async Task<IActionResult> GetAllEmployeeHistories(string? searchName,int? searchId , string? message = null)
+        {
+            var employees = new List<Employee>();
+            if (searchId == null && searchName != null)
+            {
+                 employees = await _context.Employees.Where(e => e.Name.Contains(searchName)).ToListAsync();
+            }
+            if (searchId != null && searchName == null)
+            {
+                employees = await _context.Employees.Where(e => e.Id == searchId).ToListAsync();
+            }
+            if (searchId != null && searchName != null)
+            {
+                employees = await _context.Employees.Where(e => e.Id == searchId && e.Name.Contains(searchName)).ToListAsync();
+            }
+            if (searchId == null && searchName == null)
+            {
+                employees = await _context.Employees.ToListAsync();
+            }
+            
+            if (employees == null)
+            {
+                employees = new List<Employee>();
+            }
+            ViewBag.Message = message;
+
+            return View(employees);
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> CreateEmployeeHistory(int id)
+        {
+            var existingHistory = await _dbContext.Histories
+                .FirstOrDefaultAsync(e => e.EmployeeId == id);
+
+            if (existingHistory != null)
+            {
+                return RedirectToAction("GetAllEmployeeHistories",new { message = "تم انشاء ملف لهذا الموظف من قبل"});
+            }
+
+            TempData["EmployeeId"] = id;
+
+            var employee = await _context.Employees.FindAsync(id);
+
+            var viewModel = new EmployeeHistoryViewModel
+            {
+                EmployeeId = id,
+                EmployeeName = employee?.Name
+            };
+
+            return View(viewModel);
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateEmployeeHistory(EmployeeHistoryViewModel model,string BranchName,DateTime StartDate,int EmployeeId)
+        {
+
+            try 
+            {
+                var employee = await _context.Employees.FindAsync(EmployeeId);
+                if (employee == null)
+                {
+                    return RedirectToAction("GetAllEmployeeHistories");
+                }
+
+                var history = new EmployeeHistory
+                {
+                    EmployeeId = EmployeeId,
+                    Qualification = model.Qualification,
+                    HiringDate = model.HiringDate,
+                    GraduationYear = model.GraduationYear,
+                };
+                var Branch = new EmployeeBranches
+                {
+                    EmployeeId = EmployeeId,
+                    BranchName = BranchName,
+                    StartDate = StartDate
+
+                };
+                await _dbContext.Histories.AddAsync(history);
+                await _dbContext.employeeBranches.AddAsync(Branch);
+                await _dbContext.SaveChangesAsync();
+
+                return RedirectToAction("GetAllEmployeeHistories",new { message = "تم انشاء الملف بنجاح"});
+            } 
+            catch 
+            {
+                return RedirectToAction("GetAllEmployeeHistories", new { message = "حدث خطأ اثناء انشاء الملف" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEmployeeHistoryById(int id,string? message = null)
+        {
+            var history = await _dbContext.Histories
+                .Include(h => h.Employee)
+                .FirstOrDefaultAsync(h => h.EmployeeId == id);
+
+            if (history == null)
+            {
+                return RedirectToAction("GetAllEmployeeHistories", new { message = "لا يوجد ملف لهذا الموظف" });
+            }
+
+            var employeeBranches = await _dbContext.employeeBranches
+                .Where(b => b.EmployeeId == id)
+                .ToListAsync();
+
+            var mappedViewModel = _mapper.Map<EmployeeHistoryViewModel>(history);
+            TempData["EmployeeBranches"] = employeeBranches;
+            ViewBag.Message = message;
+            return View(mappedViewModel);
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateEmployeeHistory(EmployeeHistoryViewModel model, int EmployeeId)
+        {
+            var history = await _dbContext.Histories
+                .Include(h => h.Employee)
+                .FirstOrDefaultAsync(h => h.EmployeeId == EmployeeId);
+
+            if (history == null)
+            {
+                return RedirectToAction("GetAllEmployeeHistories", new { message = "لا يوجد ملف لهذا الموظف" });
+            }
+            history.Qualification = model.Qualification;
+            history.HiringDate = model.HiringDate;
+            history.GraduationYear = model.GraduationYear;
+            history.EndOfServiceDate = model.EndOfServiceDate??null;
+            history.EndOfServiceReason = model.EndOfServiceReason ?? "";
+
+            _dbContext.Histories.Update(history);
+            int result = await _dbContext.SaveChangesAsync();
+
+            TempData["EmployeeId"] = EmployeeId;
+            if (result > 0)
+            {
+                return RedirectToAction("GetAllEmployeeHistories", new { message = "تم تحديث الملف بنجاح"  });
+            }
+            return RedirectToAction("GetAllEmployeeHistories", new { message = "حدث خطأ اثناء تحديث الملف" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddBranch(string BranchName,DateTime StartDate , int EmployeeId) 
+        {
+            try 
+            {
+                var branch = new EmployeeBranches
+                {
+                    EmployeeId = EmployeeId,
+                    BranchName = BranchName,
+                    StartDate = StartDate
+                };
+                await _dbContext.employeeBranches.AddAsync(branch);
+                int result = await _dbContext.SaveChangesAsync();
+                if (result > 0)
+                {
+                    return RedirectToAction("GetEmployeeHistoryById", new { id = EmployeeId, message = "تم اضافة الفرع بنجاح" });
+                }
+                return RedirectToAction("GetEmployeeHistoryById", new { id = EmployeeId, message = "حدث خطأ اثناء اضافة الفرع" });
+            } 
+            catch 
+            {
+                return RedirectToAction("GetEmployeeHistoryById", new { id = EmployeeId, message = "حدث خطأ اثناء اضافة الفرع" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllDiscountsById(int EmployeeId)
+        {
+            var discounts = await _context.Discounts
+                .Where(d => d.MonthlyEmployeeData.EmployeeId == EmployeeId)
+                .ToListAsync();
+            if (discounts == null || !discounts.Any())
+            {
+                return RedirectToAction("GetEmployeeHistoryById", new { message = "لا يوجد خصومات لهذا الموظف", id = EmployeeId });
+            }
+            var mappedDiscounts = _mapper.Map<IEnumerable<DiscountViewModel>>(discounts);
+            TempData["EmployeeId"] = EmployeeId;
+            TempData.Keep("EmployeeId");
+            return View(mappedDiscounts);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllBounsById(int EmployeeId)
+        {
+            var bouns = await _context.Bounss
+                .Where(b => b.MonthlyEmployeeData.EmployeeId == EmployeeId)
+                .ToListAsync();
+            if (bouns == null || !bouns.Any())
+            {
+                return RedirectToAction("GetEmployeeHistoryById", new { message = "لا يوجد مكافأت لهذا الموظف", id = EmployeeId });
+            }
+            var mappedBouns = _mapper.Map<IEnumerable<BounsViewModel>>(bouns);
+            TempData["EmployeeId"] = EmployeeId;
+            TempData.Keep("EmployeeId");
+            return View(mappedBouns);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllBorrowsById(int EmployeeId)
+        {
+            var borrows = await _context.Borrows
+                .Where(b => b.MonthlyEmployeeData.EmployeeId == EmployeeId)
+                .ToListAsync();
+            if (borrows == null || !borrows.Any())
+            {
+                return RedirectToAction("GetEmployeeHistoryById", new { message = "لا يوجد قروض لهذا الموظف", id = EmployeeId });
+            }
+            var mappedBorrows = _mapper.Map<IEnumerable<BorrowViewModel>>(borrows);
+            TempData["EmployeeId"] = EmployeeId;
+            TempData.Keep("EmployeeId");
+            return View(mappedBorrows);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllEvaluationsByEmployeeId(int employeeId)
+        {
+            var evaluations = await _context.quarterlyEvaluations
+                .Where(e => e.EmployeeId == employeeId)
+                .ToListAsync();
+            if (evaluations == null)
+            {
+                evaluations = new List<QuarterlyEvaluation>();
+            }
+            TempData["EmployeeId"] = employeeId;
+
+            return View(evaluations);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewEvaluationDetails(int evaluationId, int EmployeeId)
+        {
+            var evaluation = await _context.quarterlyEvaluations
+                .Include(q => q.EvaluationResults)
+                    .ThenInclude(r => r.EvaluationCriteria)
+                .FirstOrDefaultAsync(q => q.Id == evaluationId);
+
+            if (evaluation == null)
+                return RedirectToAction("GetAllEvaluationsByEmployeeId", new { employeeId = EmployeeId });
+
+            var viewModel = new QuarterlyEvaluationViewModel
+            {
+                EmployeeId = evaluation.EmployeeId,
+                EmployeeName = evaluation.Employee?.Name ?? "",
+                Quarter = evaluation.Quarter,
+                EvaluatedBy = evaluation.EvaluatedBy,
+                EvaluationResults = evaluation.EvaluationResults.Select(r => new EvaluationResultViewModel
+                {
+                    EvaluationCriteriaId = r.EvaluationCriteriaId,
+                    CriteriaName = r.EvaluationCriteria?.Name ?? "",
+                    Rating = r.Rating
+                }).ToList()
+            };
+            TempData["EmployeeId"] = EmployeeId;
+            TempData.Keep("EmployeeId");
+            return View(viewModel);
         }
     }
 }
