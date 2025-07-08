@@ -82,14 +82,14 @@ namespace HRManagement.Controllers
             var egyptTime = TimeOnly.FromDateTime(egyptDateTime);
 
 
-            //var existingWorkLog = await _context.WorkLogs
-            //    .FirstOrDefaultAsync(w => w.EmployeeId == employeeId && w.Day == egyptDate);
-            ////مينفعش نمنعه يسجل تاني لو هو سجل امبارح وحاول يسجل تاني انهارده لان ممكن يكون شيفت صباحي ف يبقا كدا الناس بتاعت الشيفت المسائي هما اللي ياخدو بالهم وهما بنهمو الشيفت
-            //if (existingWorkLog != null)
-            //{
-            //    TempData.Keep("EmployeeId");
-            //    return RedirectToAction("Index", new { userId = userId, message = "تم تسجيل بداية العمل بالفعل لهذا اليوم." });
-            //}
+            var existingWorkLog = await _context.WorkLogs
+                .FirstOrDefaultAsync(w => w.EmployeeId == employeeId && w.Day == egyptDate);
+            //مينفعش نمنعه يسجل تاني لو هو سجل امبارح وحاول يسجل تاني انهارده لان ممكن يكون شيفت صباحي ف يبقا كدا الناس بتاعت الشيفت المسائي هما اللي ياخدو بالهم وهما بنهمو الشيفت
+            if (existingWorkLog != null)
+            {
+                TempData.Keep("EmployeeId");
+                return RedirectToAction("Index", new { userId = userId, message = "تم تسجيل بداية العمل بالفعل لهذا اليوم." });
+            }
 
             var newWorkLog = new WorkLogs
             {
@@ -349,67 +349,94 @@ namespace HRManagement.Controllers
             return View(model);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllDiscounts(int employeeId) 
+        public async Task<ActionResult<List<DiscountViewModel>>> GetAllDiscounts(int employeeId,int? month= null, int? year = null,string? message = null)
         {
             var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
             var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
 
             var egyptDate = DateOnly.FromDateTime(egyptDateTime);
             
-            var currentMonth = egyptDate.Month;
-            var currentYear = egyptDate.Year;
+            var currentMonth = month ?? egyptDate.Month;
+            var currentYear = year ?? egyptDate.Year;
 
-            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId,currentMonth,currentYear));
+            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId, currentMonth, currentYear));
+            if (employee == null)
+            {
+                return RedirectToAction("GetAllDiscounts", new { employeeId = employeeId , month = egyptDate.Month, year = egyptDate.Year,message = "لا يوجد بيانات لهذا الشهر" });
+            }
             var mappedEmployee = _mapper.Map<EmployeeViewModel>(employee);
             var monthlyDataId = mappedEmployee.MonthlyEmployeeDataId;
             var discounts = _context.Discounts
                 .Where(d => d.MonthlyEmployeeDataId == monthlyDataId)
                 .ToList();
+            if (discounts == null) 
+            {
+                return RedirectToAction("GetAllDiscounts", new { employeeId = employeeId, month = egyptDate.Month, year = egyptDate.Year, message = "لا يوجد خصومات لهذا الشهر" });
+            }
             var mappedDiscounts = _mapper.Map<List<DiscountViewModel>>(discounts);
+            ViewBag.Message = message;
             TempData["EmployeeId"] = employeeId;
             TempData.Keep("EmployeeId");
             return View(mappedDiscounts);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllBonus(int employeeId)
+        public async Task<IActionResult> GetAllBonus(int employeeId, int? month = null, int? year = null, string? message = null)
         {
             var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
             var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
 
             var egyptDate = DateOnly.FromDateTime(egyptDateTime);
 
-            var currentMonth = egyptDate.Month;
-            var currentYear = egyptDate.Year;
+            var currentMonth = month ?? egyptDate.Month;
+            var currentYear = year ?? egyptDate.Year;
 
             var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId, currentMonth, currentYear));
+            if (employee == null)
+            {
+                return RedirectToAction("GetAllBonus", new { employeeId = employeeId, month = egyptDate.Month, year = egyptDate.Year, message = "لا يوجد بيانات لهذا الشهر" });
+            }
             var mappedEmployee = _mapper.Map<EmployeeViewModel>(employee);
             var monthlyDataId = mappedEmployee.MonthlyEmployeeDataId;
             var bonus = _context.Bounss
                 .Where(d => d.MonthlyEmployeeDataId == monthlyDataId)
                 .ToList();
+            if (bonus == null) 
+            {
+                return RedirectToAction("GetAllBonus", new { employeeId = employeeId, month = egyptDate.Month, year = egyptDate.Year, message = "لا يوجد زيادات لهذا الشهر" });
+            }
             var mappedBonus = _mapper.Map<List<BounsViewModel>>(bonus);
+            ViewBag.Message = message;
             TempData["EmployeeId"] = employeeId;
             TempData.Keep("EmployeeId");
             return View(mappedBonus);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAllBorrows(int employeeId)
+        public async Task<IActionResult> GetAllBorrows(int employeeId, int? month = null, int? year = null, string? message = null)
         {
             var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
             var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
 
             var egyptDate = DateOnly.FromDateTime(egyptDateTime);
 
-            var currentMonth = egyptDate.Month;
-            var currentYear = egyptDate.Year;
+            var currentMonth = month ?? egyptDate.Month;
+            var currentYear = year ?? egyptDate.Year;
 
             var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId, currentMonth, currentYear));
+            if (employee == null)
+            {
+                return RedirectToAction("GetAllBorrows", new { employeeId = employeeId, month = egyptDate.Month, year = egyptDate.Year, message = "لا يوجد بيانات لهذا الشهر" });
+            }
             var mappedEmployee = _mapper.Map<EmployeeViewModel>(employee);
             var monthlyDataId = mappedEmployee.MonthlyEmployeeDataId;
             var borrows = _context.Borrows
                 .Where(d => d.MonthlyEmployeeDataId == monthlyDataId)
                 .ToList();
+            if (borrows == null) 
+            {
+                return RedirectToAction("GetAllBorrows", new { employeeId = employeeId, month = egyptDate.Month, year = egyptDate.Year, message = "لا يوجد بيانات لهذا الشهر" });
+            }
             var mappedBorrows = _mapper.Map<List<BorrowViewModel>>(borrows);
+            ViewBag.Message = message;
             TempData["EmployeeId"] = employeeId;
             TempData.Keep("EmployeeId");
             return View(mappedBorrows);

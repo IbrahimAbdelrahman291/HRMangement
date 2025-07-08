@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "GetAllDiscounts";
     TempData.Keep("EmployeeId");
+    var message = ViewBag.Message;
 }
 
 <!DOCTYPE html>
@@ -48,11 +49,12 @@
         .btn {
             background-color: #007bff;
             color: white;
-            padding: 5px 10px;
+            padding: 8px 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             text-decoration: none;
+            font-size: 1rem;
         }
 
             .btn:hover {
@@ -67,32 +69,76 @@
                 background-color: #c82333;
             }
 
-        .add-btn {
-            margin-bottom: 15px;
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-input {
+            padding: 5px;
+            font-size: 1rem;
+            margin: 0 10px;
+            width: 150px;
+            box-sizing: border-box;
         }
 
         .back-btn {
+            margin-bottom: 20px;
             display: inline-block;
-            background-color: #007bff;
-            color: white;
-            padding: 8px 16px;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 1rem;
         }
 
-            .back-btn:hover {
-                background-color: #0056b3;
-            }
-
+        .message-box {
+            position: fixed;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 10px auto;
+            width: fit-content;
+            transition: opacity 0.5s;
+            opacity: 1;
+            z-index: 9999;
+        }
     </style>
+    <script>
+        window.onload = function () {
+            const messageBox = document.getElementById("message-box");
+            if (messageBox) {
+                setTimeout(() => {
+                    messageBox.style.opacity = "0";
+                    setTimeout(() => messageBox.remove(), 500);
+                }, 5000);
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="container">
         <div class="top-bar">
-            <a asp-action="MyData" asp-route-employeeId="@TempData["EmployeeId"] class="back-btn">رجوع</a>
+            <a asp-action="MyData" asp-route-employeeId="@TempData["EmployeeId"]" class="btn back-btn">رجوع</a>
         </div>
 
+        @if (ViewBag.Message != null)
+        {
+            <div id="message-box" class="message-box">
+                @message
+            </div>
+            ViewBag.Message = null;
+        }
+        <!-- فلترة حسب الشهر والسنة -->
+        <form method="get" asp-action="GetAllDiscounts">
+            <div class="filter-section">
+                <input type="hidden" name="employeeId" value="@TempData["EmployeeId"]" />
+                <input type="number" name="month" class="filter-input" min="1" max="12" placeholder="الشهر" />
+
+                <input type="number" name="year" class="filter-input" placeholder="السنه" />
+
+                <button type="submit" class="btn">تطبيق الفلتر</button>
+            </div>
+        </form>
 
         <table>
             <thead>
@@ -109,7 +155,7 @@
                 {
                     <tr>
                         <td>@discount.Id</td>
-                        <td>@discount.Date</td>
+                        <td>@discount.Date.ToString("yyyy-MM-dd")</td>
                         <td>@discount.Amount</td>
                         <td>@discount.ReasonOfDiscount</td>
                         <td>@discount.Notes</td>
@@ -120,5 +166,3 @@
     </div>
 </body>
 </html>
-
-
