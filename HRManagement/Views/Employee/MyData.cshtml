@@ -120,6 +120,16 @@
             <tr><th>عدد الساعات</th><td>@Model.Hours</td></tr>
             <tr><th>الساعات الإضافية</th><td>@Model.HoursOverTime</td></tr>
             <tr><th>الساعات المنسية</th><td>@Model.ForgetedHours</td></tr>
+            <tr><th>ساعات الاجازات</th><td>@Model.HolidayHours</td></tr>
+            <tr>
+                <th>اجمالي الساعات</th>
+                <td>
+                    @{
+                        var totalHours = (Model.Hours ?? 0) + (Model.HoursOverTime ?? 0) + (Model.ForgetedHours ?? 0) + (Model.HolidayHours ?? 0);
+                    }
+                    @totalHours
+                </td>
+            </tr>
             <tr><th>إجمالي الراتب</th><td>@Model.TotalSalary</td></tr>
 
             <tr>
