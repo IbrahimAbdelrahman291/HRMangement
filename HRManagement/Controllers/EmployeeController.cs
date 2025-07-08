@@ -19,7 +19,7 @@ namespace HRManagement.Controllers
         private readonly IGenericRepository<MonthlyEmployeeData> _monthlyEmpData;
         private readonly IMapper _mapper;
 
-        public EmployeeController(HRDbContext context,IGenericRepository<Employee> empRepo, IGenericRepository<MonthlyEmployeeData> MonthlyEmpData, IMapper mapper)
+        public EmployeeController(HRDbContext context, IGenericRepository<Employee> empRepo, IGenericRepository<MonthlyEmployeeData> MonthlyEmpData, IMapper mapper)
         {
             _context = context;
             _empRepo = empRepo;
@@ -170,7 +170,7 @@ namespace HRManagement.Controllers
 
                 workLog.TotalTime = totalWorkTime;
 
-                var employeeData = await _context.MonthlyEmployeeData.Where(m => m.Month== currentmonth && m.Year == currentyear)
+                var employeeData = await _context.MonthlyEmployeeData.Where(m => m.Month == currentmonth && m.Year == currentyear)
                                                  .FirstOrDefaultAsync(e => e.EmployeeId == employeeId);
                 if (employeeData != null)
                 {
@@ -196,33 +196,25 @@ namespace HRManagement.Controllers
             return RedirectToAction("Index", new { userId = userId, message = "تعذر انهاء الشيفت" });
         }
         [HttpGet]
-        public async Task<IActionResult> MyData()
+        public async Task<IActionResult> MyData(int? employeeId = null, int? month = null, int? year = null,string? userId = null)
         {
-            int EmpId;
 
-            if (int.TryParse(TempData["EmployeeId"]?.ToString(),out EmpId))
+            int? currentMonth = month;
+            int? currentYear = year;
+            int EmpId = employeeId ?? (int)TempData["EmployeeId"]!;
+            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(EmpId, currentMonth, currentYear));
+
+            if (employee == null)
             {
-
-                TempData.Keep("EmployeeId");
-                int? month = null;
-                int? year = null;
-
-                var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(EmpId, month, year));
-               
-                if (employee == null)
-                {
-                    TempData["ErrorMessage"] = "لا توجد بيانات للموظف.";
-                    return RedirectToAction("Index");
-                }
-                var UserId = employee.UserId;
-                TempData["UserId"] = UserId;
-                TempData.Keep("UserId");
-                var mappedEmployee = _mapper.Map<EmployeeViewModel>(employee);
-                return View(mappedEmployee);
+                return RedirectToAction("Index", new { userId = userId,message = "لم يتم العثور على الموظف" });
             }
+            var UserId = employee.UserId;
 
-            TempData["ErrorMessage"] = "لم يتم العثور على رقم الموظف.";
-            return RedirectToAction("Index");
+            TempData["UserId"] = UserId;
+            TempData.Keep("UserId");
+            TempData.Keep("EmployeeId");
+            var mappedEmployee = _mapper.Map<EmployeeViewModel>(employee);
+            return View(mappedEmployee);
         }
         [HttpGet]
         public async Task<IActionResult> MyHolidaysRequests(int employeeId, string? message)
@@ -243,14 +235,14 @@ namespace HRManagement.Controllers
             return View(mappedHolidayRequests);
         }
         [HttpGet]
-        public IActionResult RequestHoliday(int employeeId) 
+        public IActionResult RequestHoliday(int employeeId)
         {
             TempData["EmployeeId"] = employeeId;
             TempData.Keep("EmployeeId");
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> RequestHoliday(HolidayRequestViewModel model) 
+        public async Task<IActionResult> RequestHoliday(HolidayRequestViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -276,10 +268,10 @@ namespace HRManagement.Controllers
                 await _context.HolidayRequests.AddAsync(holidayRequest);
                 await _context.SaveChangesAsync();
 
-                TempData["EmployeeId"] = employeeId; 
+                TempData["EmployeeId"] = employeeId;
                 TempData.Keep("EmployeeId");
 
-                return RedirectToAction("Index", new { userId = employee.UserId, message = "تم تقديم الطلب بنجاح"});
+                return RedirectToAction("Index", new { userId = employee.UserId, message = "تم تقديم الطلب بنجاح" });
             }
 
             TempData.Keep("EmployeeId");
@@ -305,21 +297,21 @@ namespace HRManagement.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddResignationRequest(int employeeId) 
+        public IActionResult AddResignationRequest(int employeeId)
         {
             var resignationRequests = _context.ResignationRequests
-                .Where(rr => rr.EmployeeId == employeeId).Where(s => s.status == "pending" || s.status =="مقبول")
+                .Where(rr => rr.EmployeeId == employeeId).Where(s => s.status == "pending" || s.status == "مقبول")
                 .ToList();
-            if (resignationRequests.Count>0)
+            if (resignationRequests.Count > 0)
             {
-                return RedirectToAction("MyResignationRequest", new { employeeId = employeeId , message = "يوجد استقاله بالفعل مقدمه وقيد الانتظار او تم قبولها" });
+                return RedirectToAction("MyResignationRequest", new { employeeId = employeeId, message = "يوجد استقاله بالفعل مقدمه وقيد الانتظار او تم قبولها" });
             }
             TempData["EmployeeId"] = employeeId;
             TempData.Keep("EmployeeId");
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> AddResignationRequest(ResignationRequestsViewModel model) 
+        public async Task<IActionResult> AddResignationRequest(ResignationRequestsViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -332,7 +324,7 @@ namespace HRManagement.Controllers
                 DateTime egyptTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, egyptTimeZone);
                 #endregion
 
-                var Resignation = new ResignationRequests() 
+                var Resignation = new ResignationRequests()
                 {
                     EmployeeId = employeeId,
                     ReasonOfResignation = model.ReasonOfResignation,
@@ -343,33 +335,33 @@ namespace HRManagement.Controllers
                 await _context.SaveChangesAsync();
                 TempData["EmployeeId"] = employeeId;
                 TempData.Keep("EmployeeId");
-                return RedirectToAction("Index" , new { userId = employee.UserId , message = "تم تقديم الاستقاله بنجاح" });
+                return RedirectToAction("Index", new { userId = employee.UserId, message = "تم تقديم الاستقاله بنجاح" });
             }
             TempData.Keep("EmployeeId");
             return View(model);
         }
         [HttpGet]
-        public async Task<ActionResult<List<DiscountViewModel>>> GetAllDiscounts(int employeeId,int? month= null, int? year = null,string? message = null)
+        public async Task<ActionResult<List<DiscountViewModel>>> GetAllDiscounts(int employeeId, int? month = null, int? year = null, string? message = null)
         {
             var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
             var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
 
             var egyptDate = DateOnly.FromDateTime(egyptDateTime);
-            
+
             var currentMonth = month ?? egyptDate.Month;
             var currentYear = year ?? egyptDate.Year;
 
             var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId, currentMonth, currentYear));
             if (employee == null)
             {
-                return RedirectToAction("GetAllDiscounts", new { employeeId = employeeId , month = egyptDate.Month, year = egyptDate.Year,message = "لا يوجد بيانات لهذا الشهر" });
+                return RedirectToAction("GetAllDiscounts", new { employeeId = employeeId, month = egyptDate.Month, year = egyptDate.Year, message = "لا يوجد بيانات لهذا الشهر" });
             }
             var mappedEmployee = _mapper.Map<EmployeeViewModel>(employee);
             var monthlyDataId = mappedEmployee.MonthlyEmployeeDataId;
             var discounts = _context.Discounts
                 .Where(d => d.MonthlyEmployeeDataId == monthlyDataId)
                 .ToList();
-            if (discounts == null) 
+            if (discounts == null)
             {
                 return RedirectToAction("GetAllDiscounts", new { employeeId = employeeId, month = egyptDate.Month, year = egyptDate.Year, message = "لا يوجد خصومات لهذا الشهر" });
             }
@@ -400,7 +392,7 @@ namespace HRManagement.Controllers
             var bonus = _context.Bounss
                 .Where(d => d.MonthlyEmployeeDataId == monthlyDataId)
                 .ToList();
-            if (bonus == null) 
+            if (bonus == null)
             {
                 return RedirectToAction("GetAllBonus", new { employeeId = employeeId, month = egyptDate.Month, year = egyptDate.Year, message = "لا يوجد زيادات لهذا الشهر" });
             }
@@ -431,7 +423,7 @@ namespace HRManagement.Controllers
             var borrows = _context.Borrows
                 .Where(d => d.MonthlyEmployeeDataId == monthlyDataId)
                 .ToList();
-            if (borrows == null) 
+            if (borrows == null)
             {
                 return RedirectToAction("GetAllBorrows", new { employeeId = employeeId, month = egyptDate.Month, year = egyptDate.Year, message = "لا يوجد بيانات لهذا الشهر" });
             }
@@ -464,7 +456,7 @@ namespace HRManagement.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> RequestForForgetCloseShift(RequestForForgetCloseShiftViewModel model) 
+        public async Task<IActionResult> RequestForForgetCloseShift(RequestForForgetCloseShiftViewModel model)
         {
             if (!ModelState.IsValid)
             {
@@ -520,7 +512,7 @@ namespace HRManagement.Controllers
             {
                 int employeeId = (int)TempData["EmployeeId"]!;
                 var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId));
-                
+
                 var request = new RequestBorrow()
                 {
                     EmployeeId = employeeId,
@@ -528,7 +520,7 @@ namespace HRManagement.Controllers
                     Reason = model.Reason,
                     Status = "Pending",
                     Amount = model.Amount,
-                    
+
                 };
                 await _context.requestBorrows.AddAsync(request);
                 await _context.SaveChangesAsync();
@@ -563,7 +555,7 @@ namespace HRManagement.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> AddComplaint(ComplaintsViewModle modle) 
+        public async Task<IActionResult> AddComplaint(ComplaintsViewModle modle)
         {
             if (!ModelState.IsValid)
             {
@@ -580,7 +572,7 @@ namespace HRManagement.Controllers
                 int result = await _context.SaveChangesAsync();
                 TempData["EmployeeId"] = employeeId;
                 TempData.Keep("EmployeeId");
-                if (result > 0 )
+                if (result > 0)
                 {
                     return RedirectToAction("GetAllComplaints", new { employeeId = employeeId, message = "تم تقديم الطلب بنجاح" });
                 }

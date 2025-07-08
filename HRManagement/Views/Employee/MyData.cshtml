@@ -4,6 +4,7 @@
     var UserId = TempData["UserId"];
 }
 
+<!DOCTYPE html>
 <html lang="ar">
 <head>
     <meta charset="UTF-8">
@@ -14,6 +15,8 @@
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             text-align: center;
+            margin: 0;
+            padding: 0;
         }
 
         .container {
@@ -24,6 +27,10 @@
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             overflow-x: auto;
+        }
+
+        h1 {
+            margin-bottom: 10px;
         }
 
         table {
@@ -47,40 +54,60 @@
         .btn {
             text-decoration: none;
             color: white;
-            background: #dc3545;
-            padding: 5px 10px;
+            background: #007bff;
+            padding: 6px 12px;
             border-radius: 5px;
             border: none;
             cursor: pointer;
+            font-size: 1rem;
         }
 
             .btn:hover {
-                background: #c82333;
+                background: #0056b3;
             }
 
         .back-btn {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
+            display: inline-block;
+            margin-top: 15px;
+            background-color: #dc3545;
             color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.3s;
-            text-align: center;
+            padding: 8px 16px;
             text-decoration: none;
+            border-radius: 5px;
+            font-size: 1rem;
         }
 
             .back-btn:hover {
-                background-color: #0056b3;
+                background-color: #c82333;
             }
+
+        .filter-form {
+            margin: 20px 0;
+        }
+
+        .filter-input {
+            padding: 5px;
+            font-size: 1rem;
+            margin: 0 10px;
+            width: 150px;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body>
     <h1>بيانات الموظف</h1>
+
+    <!-- فلتر السنة والشهر -->
     <div class="container">
-        <a asp-action="Index" asp-route-userId="@UserId" class="back-btn">رجوع</a>
+        <form method="get" asp-action="MyData" class="filter-form">
+            <input type="hidden" name="userId" value="@UserId" />
+            <input type="hidden" name="employeeId" value="@Model.Id" />
+
+            <input type="number" name="month" class="filter-input" min="1" max="12" placeholder="الشهر" />
+            <input type="number" name="year" class="filter-input" placeholder="السنة" />
+            <button type="submit" class="btn">تطبيق الفلتر</button>
+        </form>
+
         <table>
             <tr><th>Id</th><td>@Model.Id</td></tr>
             <tr><th>الاسم</th><td>@Model.Name</td></tr>
@@ -92,8 +119,9 @@
             <tr><th>السنة</th><td>@Model.Year</td></tr>
             <tr><th>عدد الساعات</th><td>@Model.Hours</td></tr>
             <tr><th>الساعات الإضافية</th><td>@Model.HoursOverTime</td></tr>
-            <tr><th>الساعات المنسيه</th><td>@Model.ForgetedHours</td></tr>
+            <tr><th>الساعات المنسية</th><td>@Model.ForgetedHours</td></tr>
             <tr><th>إجمالي الراتب</th><td>@Model.TotalSalary</td></tr>
+
             <tr>
                 <th>الزيادات</th>
                 <td>
@@ -121,8 +149,11 @@
                     </form>
                 </td>
             </tr>
+
             <tr><th>صافي المرتب</th><td>@Model.NetSalary</td></tr>
         </table>
+
+        <a asp-action="Index" asp-route-userId="@UserId" class="back-btn">رجوع</a>
     </div>
 </body>
 </html>
