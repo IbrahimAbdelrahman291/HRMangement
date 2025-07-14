@@ -216,7 +216,7 @@ namespace HRManagement.Controllers
                 }
                 if (employee?.Insurence == null)
                 {
-                    employee!.Insurence = 255;
+                    employee!.Insurence = 0;
                 }
                 var monthlyData = await _context.MonthlyEmployeeData
                     .FirstOrDefaultAsync(m => m.EmployeeId == employee.Id && m.Month == currentMonth && m.Year == currentYear);
