@@ -393,12 +393,12 @@ namespace HRManagement.Controllers
                         {
                             temp.Holidaies = 7;
                             temp.Holidaies -= 1;
-                            temp.HolidayHours = temp.HolidayHours == null ? 0 + 8 : temp.HolidayHours + 8;
+                            temp.HolidayHours = temp.HolidayHours == null ? 0 + (temp.Target/26) : temp.HolidayHours + (temp.Target/26);
                         }
                         else
                         {
                             temp.Holidaies -= 1;
-                            temp.HolidayHours = temp.HolidayHours == null ? 0 + 8 : temp.HolidayHours + 8;
+                            temp.HolidayHours = temp.HolidayHours == null ? 0 + (temp.Target / 26) : temp.HolidayHours + (temp.Target / 26);
                         }
                         _empRepo.Update(employee);
                         _monthlyEmpRepo.Update(temp);
