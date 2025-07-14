@@ -184,6 +184,11 @@
             <p>لائحه العمل</p>
             <a asp-action="ViewInstructions" asp-route-employeeId="@TempData["EmployeeId"]">عرض</a>
         </div>
+        <div class="card">
+            <h2>تقرير الحضور والانصراف</h2>
+            <p>يمكنك مراجعه الحضور والانصراف الخاص بك</p>
+            <a asp-action="GetAttendanceReport" asp-route-employeeId="@TempData["EmployeeId"]">عرض</a>
+        </div>
     </div>
 
     <footer style="margin-top: 50px; text-align: center; padding: 15px; background-color: #f4f4f4; color: #555; font-size: 14px;">

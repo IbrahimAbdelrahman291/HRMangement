@@ -18,13 +18,15 @@ namespace HRManagement.Controllers
         private readonly IGenericRepository<Employee> _empRepo;
         private readonly IGenericRepository<MonthlyEmployeeData> _monthlyEmpData;
         private readonly IMapper _mapper;
+        private readonly IGenericRepository<WorkLogs> _worklogsRepo;
 
-        public EmployeeController(HRDbContext context, IGenericRepository<Employee> empRepo, IGenericRepository<MonthlyEmployeeData> MonthlyEmpData, IMapper mapper)
+        public EmployeeController(HRDbContext context, IGenericRepository<Employee> empRepo,IGenericRepository<MonthlyEmployeeData> MonthlyEmpData, IMapper mapper,IGenericRepository<WorkLogs> worklogsRepo)
         {
             _context = context;
             _empRepo = empRepo;
             _monthlyEmpData = MonthlyEmpData;
             _mapper = mapper;
+            _worklogsRepo = worklogsRepo;
         }
         public async Task<IActionResult> Index(string userId, string? message)
         {
@@ -595,6 +597,50 @@ namespace HRManagement.Controllers
             TempData["UserId"] = UserId;
             TempData.Keep("UserId");
             return View();
+        }
+
+        //attendance report
+        [HttpGet]
+        public async Task<IActionResult> GetAttendanceReport(int employeeId,DateTime? StartDate = null, DateTime? EndDate = null, string? EmployeeName = null, string? BranchName = null)
+        {
+            var egyptTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Egypt Standard Time");
+            var egyptDateTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, egyptTimeZone);
+            var egyptDate = DateOnly.FromDateTime(egyptDateTime);
+            if (StartDate is null || EndDate is null)
+            {
+                StartDate = egyptDateTime;
+                EndDate = egyptDateTime;
+            }
+            else
+            {
+                if (StartDate > EndDate)
+                {
+                    var container = StartDate;
+                    StartDate = EndDate;
+                    EndDate = container;
+                }
+                if (StartDate > egyptDateTime || EndDate > egyptDateTime)
+                {
+                    StartDate = EndDate = egyptDateTime;
+                }
+            }
+
+
+            var AllAttendee = await _worklogsRepo.GetAllWithSpecAsync(new WorkLogsSpec(StartDate, EndDate, employeeId, EmployeeName, BranchName));
+            AllAttendee = AllAttendee.OrderBy(e => e.Day);
+            AllAttendee = AllAttendee.OrderBy(e => e.Start);
+            var MappedAttendee = _mapper.Map<IEnumerable<WorkLogsViewModel>>(AllAttendee);
+            var employee = await _empRepo.GetByIdWithSpecAsync(new EmployeeSpec(employeeId,egyptDate.Month,egyptDate.Year));
+            if (employee == null)
+            {
+                return RedirectToAction("Index", new { userId = employee.UserId, message = "لا يوجد بيانات لهذا الشهر" });
+            }
+            var userId = employee.UserId;
+            TempData["UserId"] = userId;
+            TempData.Keep("UserId");
+            TempData["EmployeeId"] = employeeId;
+            TempData.Keep("EmployeeId");
+            return View(MappedAttendee);
         }
 
     }
